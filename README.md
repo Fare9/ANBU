@@ -52,7 +52,7 @@ And I wrote the next thing:
 
 ## Changelog
 
-### Version 0.5 (we will start for this one, why not?)
+### Version 0.6 (we will start for this one, why not?)
 
 - Written the base of the unpacker.
 - Added two heuristics to unpacking model.
@@ -61,7 +61,6 @@ And I wrote the next thing:
 ## ToDO
 
 - Next version should include some new heuristic to detect Microsoft Visual Studio OEP trace.
-- Allow user to choose unpacked file name.
 - Include a way to unpack crypters by saving decrypted code.
 
 ## Special thanks to
@@ -72,6 +71,7 @@ And I wrote the next thing:
 - [Jurrian Bremer][5]: For his RunPE unpacking module.
 - [Arancino Project][6]: For their heuristics ideas and dynamic protection framework.
 - [Dennis Andriesse][7]: For his book Practical Binary Analysis which helped me to start this project.
+- [LIEF Project and Romain Thomas][8]: For his project and the permission to use LIEF code for parser and builder.	
 
 [1]: <https://software.intel.com/en-us/articles/pin-a-binary-instrumentation-tool-downloads> "Intel PIN download link"
 [2]: <https://twitter.com/MZ_IAT> "MZ IAT Twitter"
@@ -79,4 +79,5 @@ And I wrote the next thing:
 [4]: <https://twitter.com/matalaz> "Joxean Koret Twitter"
 [5]: <https://twitter.com/skier_t> "Jurrian Bremer Twitter"
 [6]: <https://github.com/necst/arancino> "Arancino Project"
-[7]: <https://syssec->mistakenot.net/> "Dennis Andriesse webpage"
+[7]: <https://syssec.mistakenot.net/> "Dennis Andriesse webpage"
+[8]: <https://lief.quarkslab.com/> "Lief Project"
