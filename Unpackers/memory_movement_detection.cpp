@@ -278,7 +278,8 @@ bool dump_to_file(ADDRINT target)
 				 fprintf(stderr, "[INFO] Adding to the import Function: 0%x\n", dll_imports.at(i)->functions.at(j).function_ordinal);
 				 fprintf(logfile, "[INFO] Adding to the import Function: 0%x\n", dll_imports.at(i)->functions.at(j).function_ordinal);
 
-				 function = &library->add_entry(import_entry_t{ dll_imports.at(i)->functions.at(j).function_ordinal,"" });
+				 const uint64_t ORDINAL_MASK = pe_file->type() == PE_TYPE::pe32_k ? 0x80000000 : 0x8000000000000000;
+				 function = &library->add_entry(import_entry_t( ORDINAL_MASK | dll_imports.at(i)->functions.at(j).function_ordinal,"" ));
 			 }
 			 else
 			 {

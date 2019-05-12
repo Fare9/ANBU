@@ -30,6 +30,7 @@ I'm not professional on this, but I give some examples to the people who wanna t
 - EZIP
 - FSG
 - Mpress
+- Aspack
 - Basic RunPE
 - Test
 
