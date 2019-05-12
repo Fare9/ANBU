@@ -1,0 +1,177 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Documents">
+      <UniqueIdentifier>{b8dd2600-7302-4aa7-a99d-1607cd3cd4fb}</UniqueIdentifier>
+      <Extensions>txt;doc;html</Extensions>
+    </Filter>
+    <Filter Include="Header Files\PE">
+      <UniqueIdentifier>{421eac3f-63e7-4fc9-86c7-bb842b147d6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\PE">
+      <UniqueIdentifier>{645a29ac-ac0a-4094-bc2a-89d585670d8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Unpacking">
+      <UniqueIdentifier>{925e0009-bb38-4404-af38-ca8e7a471cd0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Unpacking">
+      <UniqueIdentifier>{1b13d684-e6da-4760-9616-74e7087214ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\PE\parser">
+      <UniqueIdentifier>{299b4aac-6ced-4f65-baa5-4b76bf4cd6f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\PE\parser">
+      <UniqueIdentifier>{a919ab3a-2f56-4b60-94b5-33accf3d11ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\PE\fixer">
+      <UniqueIdentifier>{345ba0ef-70e5-451c-b935-a63a6afc26bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\PE\fixer">
+      <UniqueIdentifier>{92b119b2-ea87-41b3-8d9b-689b3e3c0e28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\anti-anti">
+      <UniqueIdentifier>{6478e994-26a8-42c8-b255-dce0d43c88b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\anti-anti">
+      <UniqueIdentifier>{bbc166f3-9fb0-4ce8-8be5-3a59533d15e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Unpacking\heuristics">
+      <UniqueIdentifier>{f25e4a37-8747-4226-9342-d282947d8b66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Unpacking\heuristics">
+      <UniqueIdentifier>{a6b7fa07-a68e-45d6-83df-9d4b9aa94b0c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README">
+      <Filter>Documents</Filter>
+    </None>
+    <None Include="makefile">
+      <Filter>Documents</Filter>
+    </None>
+    <None Include="makefile.rules">
+      <Filter>Documents</Filter>
+    </None>
+    <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="unpacker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Unpackers\memory_movement_detection.h">
+      <Filter>Header Files\Unpacking</Filter>
+    </ClInclude>
+    <ClInclude Include="PE\dos_header.h">
+      <Filter>Header Files\PE\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Unpackers\generic_instrumentation.h">
+      <Filter>Header Files\Unpacking</Filter>
+    </ClInclude>
+    <ClInclude Include="PE\nt_header.h">
+      <Filter>Header Files\PE\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="PE\optional_header.h">
+      <Filter>Header Files\PE\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="PE\data_directory_header.h">
+      <Filter>Header Files\PE\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="PE\section_header.h">
+      <Filter>Header Files\PE\parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Unpackers\run_pe_detector.h">
+      <Filter>Header Files\Unpacking</Filter>
+    </ClInclude>
+    <ClInclude Include="anti-methods\anti-methods.h">
+      <Filter>Header Files\anti-anti</Filter>
+    </ClInclude>
+    <ClInclude Include="Unpackers\heuristics\pushad_popad_heuristic.h">
+      <Filter>Header Files\Unpacking\heuristics</Filter>
+    </ClInclude>
+    <ClInclude Include="Unpackers\heuristics\w_xor_x_heuristic.h">
+      <Filter>Header Files\Unpacking\heuristics</Filter>
+    </ClInclude>
+    <ClInclude Include="PE\binary.h">
+      <Filter>Header Files\PE</Filter>
+    </ClInclude>
+    <ClInclude Include="PE\builder.h">
+      <Filter>Header Files\PE\fixer</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PE\import_entry.h">
+      <Filter>Header Files\PE\fixer</Filter>
+    </ClInclude>
+    <ClInclude Include="PE\import.h">
+      <Filter>Header Files\PE\fixer</Filter>
+    </ClInclude>
+    <ClInclude Include="PE\structures_and_enums.h">
+      <Filter>Header Files\PE</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="unpacker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Unpackers\memory_movement_detection.cpp">
+      <Filter>Source Files\Unpacking</Filter>
+    </ClCompile>
+    <ClCompile Include="PE\dos_header.cpp">
+      <Filter>Source Files\PE\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="Unpackers\generic_instrumentation.cpp">
+      <Filter>Source Files\Unpacking</Filter>
+    </ClCompile>
+    <ClCompile Include="PE\nt_header.cpp">
+      <Filter>Source Files\PE\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="PE\optional_header.cpp">
+      <Filter>Source Files\PE\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="PE\section_header.cpp">
+      <Filter>Source Files\PE\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="PE\data_directory_header.cpp">
+      <Filter>Source Files\PE\parser</Filter>
+    </ClCompile>
+    <ClCompile Include="Unpackers\run_pe_detector.cpp">
+      <Filter>Source Files\Unpacking</Filter>
+    </ClCompile>
+    <ClCompile Include="anti-methods\anti-methods.cpp">
+      <Filter>Source Files\anti-anti</Filter>
+    </ClCompile>
+    <ClCompile Include="Unpackers\heuristics\pushad_popad_heuristic.cpp">
+      <Filter>Source Files\Unpacking\heuristics</Filter>
+    </ClCompile>
+    <ClCompile Include="Unpackers\heuristics\w_xor_x_heuristic.cpp">
+      <Filter>Source Files\Unpacking\heuristics</Filter>
+    </ClCompile>
+    <ClCompile Include="PE\binary.cpp">
+      <Filter>Source Files\PE</Filter>
+    </ClCompile>
+    <ClCompile Include="PE\builder.cpp">
+      <Filter>Source Files\PE\fixer</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PE\import_entry.cpp">
+      <Filter>Source Files\PE\fixer</Filter>
+    </ClCompile>
+    <ClCompile Include="PE\import.cpp">
+      <Filter>Source Files\PE\fixer</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
