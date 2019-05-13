@@ -8,7 +8,7 @@
 #define RUN_PE_DETECTOR_H
 
 #include "common.h"
-#include "builder.h"
+#include "binary.h"
 #include "data_directory_header.h"
 
 #define USHORT	WINDOWS::USHORT

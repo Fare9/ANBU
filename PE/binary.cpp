@@ -654,7 +654,7 @@ bool binary_t::on_pe_file(ADDRINT address)
 
 	address -= binary_base_address;
 
-	if (binary_base_address + optional_header_->sizeof_image() >= address)
+	if (address <= optional_header_->sizeof_image())
 		return true;
 
 	return false;

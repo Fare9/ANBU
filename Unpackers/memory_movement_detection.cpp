@@ -14,11 +14,13 @@ ADDRINT											saved_addr;			// temporary variable needed for storing state b
 																	// two analysis routines
 bool											any_import_resolved = false;
 
+bool											header_modified = false;
+
 w_xor_x_heuristic_t								w_xor_x_heuristic;
 
 pushad_popad_heuristic_t						pushad_popad_heuristic;
 /******************* Variables for dump *******************/
-lief_import_t*										library;
+lief_import_t*									library;
 import_entry_t*									function;
 
 
@@ -133,7 +135,14 @@ void log_memwrite(UINT32 size)
 		PIN_SafeCopy((VOID*)&aux, (const void*)i, 1);
 		w_xor_x_heuristic.set_shadow_memory_value(i, aux);
 	}
-
+	
+	if (!header_modified &&
+		(addr >= main_base_address &&
+			addr < main_base_address + sizeof(pe_dos_header))
+		)
+	{
+		header_modified = true;
+	}
 
 	// check if is writing an API to memory
 	// only will be executed after a GetProcAddress
@@ -232,30 +241,33 @@ void check_indirect_ctransfer(ADDRINT ip, ADDRINT target, BOOL taken)
 
 bool dump_to_file(ADDRINT target)
  {
-	 auto sections = pe_file->section_table_header();
+	if (header_modified)
+		pe_file->parse();
+
+	auto sections = pe_file->section_table_header();
 	 
-	 for (size_t i = 0; i < sections.size(); i++)
-	 {
-		 sections[i].pointerto_raw_data(sections[i].virtual_address());
-		 sections[i].sizeof_raw_data(sections[i].virtual_size());
-	 }
+	for (size_t i = 0; i < sections.size(); i++)
+	{
+		sections[i].pointerto_raw_data(sections[i].virtual_address());
+		sections[i].sizeof_raw_data(sections[i].virtual_size());
+	}
 
-	 pe_file->section_table_header(sections);
+	pe_file->section_table_header(sections);
 
-	 /*
-	 *	go through the APIs
-	 */
-	 for (size_t i = 0; i < dll_imports.size(); i++)
-	 {
-		 // check if the dll to insert is inside of the unpacked zone
-		 // if not, go fuck off
-		 if (dll_imports.at(i)->dll_nameA.size() != 0)
+	/*
+	*	go through the APIs
+	*/
+	for (size_t i = 0; i < dll_imports.size(); i++)
+	{
+		// check if the dll to insert is inside of the unpacked zone
+		// if not, go fuck off
+		if (dll_imports.at(i)->dll_nameA.size() != 0)
 		 {
 			 fprintf(stderr, "[INFO] Adding to the import DLL: %s\n", dll_imports.at(i)->dll_nameA.c_str());
 			 fprintf(logfile, "[INFO] Adding to the import DLL: %s\n", dll_imports.at(i)->dll_nameA.c_str());
 			 library = pe_file->add_library(dll_imports.at(i)->dll_nameA.c_str());
 		 }
-		 else
+		else
 		 {
 			 fwprintf(stderr, L"[INFO] Adding to the import DLL: %S\n", dll_imports.at(i)->dll_nameW.c_str());
 			 fwprintf(logfile, L"[INFO] Adding to the import DLL: %s\n", dll_imports.at(i)->dll_nameW.c_str());
@@ -263,64 +275,64 @@ bool dump_to_file(ADDRINT target)
 			 wcstombs(dll_nameA, dll_imports.at(i)->dll_nameW.c_str(), wcslen(dll_imports.at(i)->dll_nameW.c_str()) + 1);
 			 library = pe_file->add_library(dll_nameA);
 		 }
-		 ADDRINT first_thunk = 0;
+		ADDRINT first_thunk = 0;
 
-		 for (size_t j = 0; j < dll_imports.at(i)->functions.size(); j++)
-		 {
-			 if (!pe_file->on_pe_file(dll_imports.at(i)->functions.at(j).function_destination))
-				 continue;
+		for (size_t j = 0; j < dll_imports.at(i)->functions.size(); j++)
+		{
+			if (!pe_file->on_pe_file(dll_imports.at(i)->functions.at(j).function_destination))
+				continue;
 
-			 if (dll_imports.at(i)->functions.at(j).is_ordinal)
-			 {
-				 if (dll_imports.at(i)->functions.at(j).function_ordinal > 0xFFFF)
-					 continue;
+			if (dll_imports.at(i)->functions.at(j).is_ordinal)
+			{
+				if (dll_imports.at(i)->functions.at(j).function_ordinal > 0xFFFF)
+					continue;
 
-				 fprintf(stderr, "[INFO] Adding to the import Function: 0%x\n", dll_imports.at(i)->functions.at(j).function_ordinal);
-				 fprintf(logfile, "[INFO] Adding to the import Function: 0%x\n", dll_imports.at(i)->functions.at(j).function_ordinal);
+				fprintf(stderr, "[INFO] Adding to the import Function: 0%x\n", dll_imports.at(i)->functions.at(j).function_ordinal);
+				fprintf(logfile, "[INFO] Adding to the import Function: 0%x\n", dll_imports.at(i)->functions.at(j).function_ordinal);
 
-				 const uint64_t ORDINAL_MASK = pe_file->type() == PE_TYPE::pe32_k ? 0x80000000 : 0x8000000000000000;
-				 function = &library->add_entry(import_entry_t( ORDINAL_MASK | dll_imports.at(i)->functions.at(j).function_ordinal,"" ));
-			 }
-			 else
-			 {
-				 if (dll_imports.at(i)->functions.at(j).function_name.size() == 0 || dll_imports.at(i)->functions.at(j).function_name.size() > 256)
-					 continue;
+				const uint64_t ORDINAL_MASK = pe_file->type() == PE_TYPE::pe32_k ? 0x80000000 : 0x8000000000000000;
+				function = &library->add_entry(import_entry_t( ORDINAL_MASK | dll_imports.at(i)->functions.at(j).function_ordinal,"" ));
+			}
+			else
+			{
+				if (dll_imports.at(i)->functions.at(j).function_name.size() == 0 || dll_imports.at(i)->functions.at(j).function_name.size() > 256)
+					continue;
 
-				 fprintf(stderr, "[INFO] Adding to the import Function: %s\n", dll_imports.at(i)->functions.at(j).function_name.c_str());
-				 fprintf(logfile, "[INFO] Adding to the import Function: %s\n", dll_imports.at(i)->functions.at(j).function_name.c_str());
+				fprintf(stderr, "[INFO] Adding to the import Function: %s\n", dll_imports.at(i)->functions.at(j).function_name.c_str());
+				fprintf(logfile, "[INFO] Adding to the import Function: %s\n", dll_imports.at(i)->functions.at(j).function_name.c_str());
 
-				 function = &library->add_entry(dll_imports.at(i)->functions.at(j).function_name);
-			 }
+				function = &library->add_entry(dll_imports.at(i)->functions.at(j).function_name);
+			}
 			 
-			 if (first_thunk == 0)
-				 first_thunk = dll_imports.at(i)->functions.at(j).function_destination;
-			 else if (dll_imports.at(i)->functions.at(j).function_destination < first_thunk)
-				 first_thunk = dll_imports.at(i)->functions.at(j).function_destination;
-		 }
-		 if (first_thunk == 0x0)
-			 continue;
+			if (first_thunk == 0)
+				first_thunk = dll_imports.at(i)->functions.at(j).function_destination;
+			else if (dll_imports.at(i)->functions.at(j).function_destination < first_thunk)
+				first_thunk = dll_imports.at(i)->functions.at(j).function_destination;
+		}
+		if (first_thunk == 0x0)
+			continue;
 
-		 first_thunk -= IMG_StartAddress(IMG_FindByAddress(first_thunk));
-		 library->import_address_table_rva(first_thunk);
-	 }
+		first_thunk -= IMG_StartAddress(IMG_FindByAddress(first_thunk));
+		library->import_address_table_rva(first_thunk);
+	}
 
 
-	 fprintf(stderr, "[INFO] Dumping to file\n");
-	 fprintf(logfile, "[INFO] Dumping to file\n");
+	fprintf(stderr, "[INFO] Dumping to file\n");
+	fprintf(logfile, "[INFO] Dumping to file\n");
 	 
-	 char file_name[MAX_PATH];
-	 if (unpacked_file_name.size() != 0)
-		 snprintf(file_name, sizeof(file_name) - 1, "%s", unpacked_file_name.c_str());
-	 else
-		 snprintf(file_name, sizeof(file_name) - 1, "file.base-0x%x.entry-0x%x.bin", (uintptr_t)main_base_address, (uintptr_t)(target - main_base_address));
+	char file_name[MAX_PATH];
+	if (unpacked_file_name.size() != 0)
+		snprintf(file_name, sizeof(file_name) - 1, "%s", unpacked_file_name.c_str());
+	else
+		snprintf(file_name, sizeof(file_name) - 1, "file.base-0x%x.entry-0x%x.bin", (uintptr_t)main_base_address, (uintptr_t)(target - main_base_address));
 
-	 if (!pe_file->write(file_name, target))
-	 {
-		 fprintf(stderr, "[ERROR] Error dumping the file\n");
-		 fprintf(logfile, "[ERROR] Error dumping the file\n");
+	if (!pe_file->write(file_name, target))
+	{
+		fprintf(stderr, "[ERROR] Error dumping the file\n");
+		fprintf(logfile, "[ERROR] Error dumping the file\n");
 
-		 return false;
-	 }
+		return false;
+	}
 	
-	 return true;
+	return true;
  }

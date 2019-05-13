@@ -26,7 +26,7 @@ public:
 
 	//! @brief Return `PE32` or `PE32+`
 	PE_TYPE type(void) const;
-
+	bool		parse(void);
 	bool		analyze_binary(void);
 	bool		has_section_changed_entropy(ADDRINT address_of_section);
 	bool		on_pe_file(ADDRINT address);
@@ -164,7 +164,6 @@ public:
 private:
 	float		calculate_entropy_section(pe_parser::section_header_t section);
 	bool		calculate_initial_entropy(void);
-	bool		parse(void);
 	bool		parse_headers(void);
 	bool		parse_dos_stub(void);
 	bool		parse_data_directories(void);
