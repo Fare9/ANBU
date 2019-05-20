@@ -30,9 +30,7 @@ void get_addresses_from_images(IMG img, VOID *v)
 	RTN getmodulehandleW;
 	RTN getprocaddress;
 
-
-	fprintf(stderr, "[INFO] IMG Loaded: %s\n", IMG_Name(img).c_str());
-	fprintf(logfile, "[INFO] IMG Loaded: %s\n", IMG_Name(img).c_str());
+	ANBU::LOGGER_INFO(logfile, "IMG Loaded: %s\n", IMG_Name(img).c_str());
 
 	if (IMG_IsMainExecutable(img)) 
 	/*
@@ -43,8 +41,7 @@ void get_addresses_from_images(IMG img, VOID *v)
 		main_base_address = IMG_StartAddress(img);
 		pe_file = new binary_t(main_base_address);
 		pe_file->analyze_binary();
-		fprintf(stderr, "[INFO] Binary Base Address: 0x%x\n", main_base_address);
-		fprintf(logfile, "[INFO] Binary Base Address: 0x%x\n", main_base_address);
+		ANBU::LOGGER_INFO(logfile, "Binary Base Address: 0x%x\n", main_base_address);
 		return;
 	}
 
@@ -54,7 +51,7 @@ void get_addresses_from_images(IMG img, VOID *v)
 	{
 		RTN_Open(loadlibraryA);
 
-		fprintf(stderr, "[INFO] Inserting callbacks for: %s\n", RTN_Name(loadlibraryA).c_str());
+		ANBU::LOGGER_INFO("Inserting callbacks for: %s\n", RTN_Name(loadlibraryA).c_str());
 
 		RTN_InsertCall(loadlibraryA,
 			IPOINT_BEFORE,
@@ -78,7 +75,7 @@ void get_addresses_from_images(IMG img, VOID *v)
 	{
 		RTN_Open(loadlibraryW);
 
-		fprintf(stderr, "[INFO] Inserting callbacks for: %s\n", RTN_Name(loadlibraryW).c_str());
+		ANBU::LOGGER_INFO("Inserting callbacks for: %s\n", RTN_Name(loadlibraryW).c_str());
 
 		RTN_InsertCall(loadlibraryW,
 			IPOINT_BEFORE,
@@ -102,7 +99,7 @@ void get_addresses_from_images(IMG img, VOID *v)
 	{
 		RTN_Open(getmodulehandleA);
 
-		fprintf(stderr, "[INFO] Inserting callbacks for: %s\n", RTN_Name(getmodulehandleA).c_str());
+		ANBU::LOGGER_INFO("Inserting callbacks for: %s\n", RTN_Name(getmodulehandleA).c_str());
 
 		RTN_InsertCall(getmodulehandleA,
 			IPOINT_BEFORE,
@@ -126,7 +123,7 @@ void get_addresses_from_images(IMG img, VOID *v)
 	{
 		RTN_Open(getmodulehandleW);
 
-		fprintf(stderr, "[INFO] Inserting callbacks for: %s\n", RTN_Name(getmodulehandleW).c_str());
+		ANBU::LOGGER_INFO("Inserting callbacks for: %s\n", RTN_Name(getmodulehandleW).c_str());
 
 		RTN_InsertCall(getmodulehandleW,
 			IPOINT_BEFORE,
@@ -150,7 +147,7 @@ void get_addresses_from_images(IMG img, VOID *v)
 	{
 		RTN_Open(getprocaddress);
 
-		fprintf(stderr, "[INFO] Inserting callbacks for: %s\n", RTN_Name(getprocaddress).c_str());
+		ANBU::LOGGER_INFO("Inserting callbacks for: %s\n", RTN_Name(getprocaddress).c_str());
 
 		RTN_InsertCall(getprocaddress,
 			IPOINT_BEFORE,
@@ -213,13 +210,11 @@ void hook_loadlibrary_after(ADDRINT dll_address)
 				aux->dll_nameA = saved_dll_nameA;
 				dll_imports.push_back(aux);
 
-				fprintf(stderr, "[INFO] LoadLibraryA dll name: %s\n", saved_dll_nameA);
-				fprintf(logfile, "[INFO] LoadLibraryA dll name: %s\n", saved_dll_nameA);
+				ANBU::LOGGER_INFO(logfile, "LoadLibraryA dll name: %s\n", saved_dll_nameA);
 
 				aux->dll_address = dll_address;
 
-				fprintf(stderr, "[INFO] LoadLibrary returned: 0x%x\n", dll_address);
-				fprintf(logfile, "[INFO] LoadLibrary returned: 0x%x\n", dll_address);
+				ANBU::LOGGER_INFO(logfile, "LoadLibrary returned: 0x%x\n", dll_address);
 			}
 		}
 		else if (saved_dll_nameW != nullptr)
@@ -231,13 +226,11 @@ void hook_loadlibrary_after(ADDRINT dll_address)
 				aux->dll_nameW = saved_dll_nameW;
 				dll_imports.push_back(aux);
 
-				fwprintf(stderr, L"[INFO] LoadLibraryW dll name: %S\n", saved_dll_nameW);
-				fwprintf(logfile, L"[INFO] LoadLibraryW dll name: %S\n", saved_dll_nameW);
+				ANBU::LOGGER_INFO(logfile, L"LoadLibraryW dll name: %S\n", saved_dll_nameW);
 
 				aux->dll_address = dll_address;
 
-				fprintf(stderr, "[INFO] LoadLibrary returned: 0x%x\n", dll_address);
-				fprintf(logfile, "[INFO] LoadLibrary returned: 0x%x\n", dll_address);
+				ANBU::LOGGER_INFO(logfile, "LoadLibrary returned: 0x%x\n", dll_address);
 			}
 		}
 		saved_dll_nameA = nullptr;
@@ -304,13 +297,11 @@ void hook_getprocaddress_before(ADDRINT dll_address, const char* function_name)
 		aux->functions.push_back(func);
 		if (func.is_ordinal)
 		{
-			fprintf(stderr, "[INFO] dll 0x%x(%s), function 0x%x\n", dll_address, IMG_Name(IMG_FindByAddress(dll_address)).c_str(), func.function_ordinal);
-			fprintf(logfile, "[INFO] dll 0x%x(%s), function 0x%x\n", dll_address, IMG_Name(IMG_FindByAddress(dll_address)).c_str(), func.function_ordinal);
+			ANBU::LOGGER_INFO(logfile, "Dll 0x%x(%s), function 0x%x\n", dll_address, IMG_Name(IMG_FindByAddress(dll_address)).c_str(), func.function_ordinal);
 		}
 		else
 		{
-			fprintf(stderr, "[INFO] dll 0x%x(%s), function %s\n", dll_address, IMG_Name(IMG_FindByAddress(dll_address)).c_str(), function_name);
-			fprintf(logfile, "[INFO] dll 0x%x(%s), function %s\n", dll_address, IMG_Name(IMG_FindByAddress(dll_address)).c_str(), function_name);	
+			ANBU::LOGGER_INFO(logfile, "Dll 0x%x(%s), function %s\n", dll_address, IMG_Name(IMG_FindByAddress(dll_address)).c_str(), function_name);	
 		}
 		PIN_UnlockClient();
 
@@ -323,8 +314,7 @@ void hook_getprocaddress_after(ADDRINT function_address)
 	{
 		check_first_thunk = true;
 
-		fprintf(stderr, "[INFO] GetProcAddress returned: 0x%x\n", function_address);
-		fprintf(logfile, "[INFO] GetProcAddress returned: 0x%x\n", function_address);
+		ANBU::LOGGER_INFO(logfile, "GetProcAddress returned: 0x%x\n", function_address);
 
 		// add the function address to the last function
 		aux->functions.at(

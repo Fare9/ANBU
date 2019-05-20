@@ -8,15 +8,18 @@ void w_xor_x_heuristic_t::set_shadow_memory_as_writable(ADDRINT target)
 	shadow_mem[target].w = true;
 }
 
+
 void w_xor_x_heuristic_t::set_shadow_memory_as_executable(ADDRINT target)
 {
 	shadow_mem[target].x = true;
 }
 
+
 void w_xor_x_heuristic_t::set_shadow_memory_value(ADDRINT target, unsigned char val)
 {
 	shadow_mem[target].val = val;
 }
+
 
 bool w_xor_x_heuristic_t::is_shadow_memory_writable(ADDRINT target)
 {
@@ -27,6 +30,7 @@ bool w_xor_x_heuristic_t::is_shadow_memory_writable(ADDRINT target)
 	return false;
 }
 
+
 bool w_xor_x_heuristic_t::is_shadow_memory_executable(ADDRINT target)
 {
 	if (shadow_mem.find(target) != shadow_mem.end())
@@ -35,6 +39,7 @@ bool w_xor_x_heuristic_t::is_shadow_memory_executable(ADDRINT target)
 	}
 	return false;
 }
+
 
 void w_xor_x_heuristic_t::set_cluster(ADDRINT target, bool dump)
 {
@@ -106,6 +111,7 @@ void w_xor_x_heuristic_t::set_cluster(ADDRINT target, bool dump)
 		this->dump_cluster_to_file(c, target);
 }
 
+
 bool w_xor_x_heuristic_t::in_cluster(ADDRINT target)
 /*
 *   Function to check target address is inside of
@@ -128,19 +134,19 @@ bool w_xor_x_heuristic_t::in_cluster(ADDRINT target)
 	return false;
 }
 
+
 void w_xor_x_heuristic_t::add_cluster_to_clusters_list(mem_cluster_t c)
 {
 	clusters.push_back(c);
 }
+
 
 void w_xor_x_heuristic_t::dump_cluster_to_file(mem_cluster_t c, ADDRINT entry)
 {
 	FILE *f;
 	char buf[256];
 
-	fprintf(stderr, "[INFO] extracting unpacked region 0x%x %c%c entry 0x%x\n",
-		(uintptr_t)c.base, c.w ? 'w' : '-', c.x ? 'x' : '-', (uintptr_t)entry);
-	fprintf(logfile, "[INFO] extracting unpacked region 0x%x %c%c entry 0x%x\n",
+	ANBU::LOGGER_INFO("Extracting unpacked region 0x%x %c%c entry 0x%x\n",
 		(uintptr_t)c.base, c.w ? 'w' : '-', c.x ? 'x' : '-', (uintptr_t)entry);
 
 	snprintf(buf, sizeof(buf), "unpacked.0x%x-0x%x_entry-0x%x",
@@ -149,8 +155,7 @@ void w_xor_x_heuristic_t::dump_cluster_to_file(mem_cluster_t c, ADDRINT entry)
 	f = fopen(buf, "wb");
 	if (!f)
 	{
-		fprintf(stderr, "[ERROR] failed to open file '%s' for writing\n", buf);
-		fprintf(logfile, "[ERROR] failed to open file '%s' for writing\n", buf);
+		ANBU::LOGGER_ERROR(logfile, "Failed to open file '%s' for writing\n", buf);
 	}
 	else
 	{
@@ -158,8 +163,7 @@ void w_xor_x_heuristic_t::dump_cluster_to_file(mem_cluster_t c, ADDRINT entry)
 		{
 			if (fwrite((const void*)&shadow_mem[i].val, 1, 1, f) != 1)
 			{
-				fprintf(stderr, "[ERROR] failed to write unpacked byte 0x%x to file '%s'\n", (unsigned int)i, buf);
-				fprintf(logfile, "[ERROR] failed to write unpacked byte 0x%x to file '%s'\n", (unsigned int)i, buf);
+				ANBU::LOGGER_ERROR(logfile, "Failed to write unpacked byte 0x%x to file '%s'\n", (unsigned int)i, buf);
 			}
 		}
 

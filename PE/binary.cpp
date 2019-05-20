@@ -46,9 +46,7 @@ binary_t::binary_t(ADDRINT binary_address) :
 	this->type_ = PE_TYPE::pe32_k;
 #endif // _Win64
 
-
-	fprintf(stderr,  "[INFO] PE file base address: 0x%x\n", (uintptr_t)this->binary_base_address);
-	fprintf(logfile, "[INFO] PE file base address: 0x%x\n", (uintptr_t)this->binary_base_address);
+	ANBU::LOGGER_INFO(logfile, "PE file base address: 0x%x\n", (uintptr_t)this->binary_base_address);
 }
 
 
@@ -79,8 +77,7 @@ binary_t::binary_t(IMG binary_img) :
 	this->type_ = PE_TYPE::pe32_k;
 #endif // _Win64
 
-	fprintf(stderr, "[INFO] PE file base address: 0x%x\n", (uintptr_t)this->binary_base_address);
-	fprintf(logfile, "[INFO] PE file base address: 0x%x\n", (uintptr_t)this->binary_base_address);
+	ANBU::LOGGER_INFO(logfile, "PE file base address: 0x%x\n", (uintptr_t)this->binary_base_address);
 }
 
 
@@ -121,6 +118,7 @@ binary_t::~binary_t()
 		this->section_table_header_.clear();
 	}
 }
+
 
 PE_TYPE binary_t::type(void) const
 {
@@ -295,7 +293,7 @@ uint64_t binary_t::virtual_size(void) const
 
 	size = LIEF::align(size, this->optional_header_->section_alignment());
 
-	fprintf(stderr, "[INFO] New virtual size of binary 0x%llx", size);
+	ANBU::LOGGER_INFO("New virtual size of binary 0x%llx", size);
 
 	return size;
 }
@@ -306,10 +304,12 @@ std::vector<pe_parser::section_header_t> binary_t::section_table_header(void)
 	return this->section_table_header_;
 }
 
+
 void binary_t::section_table_header(std::vector<pe_parser::section_header_t> sections)
 {
 	this->section_table_header_ = sections;
 }
+
 
 pe_parser::section_header_t* binary_t::get_section(std::string& name)
 {
@@ -351,8 +351,7 @@ void binary_t::remove_section(std::string& name)
 		}
 	}
 	
-	fprintf(stderr, "[ERROR] Section %s not found\n", name.c_str());
-	fprintf(logfile, "[ERROR] Section %s not found\n", name.c_str());
+	ANBU::LOGGER_ERROR(logfile, "Section %s not found\n", name.c_str());
 	return;
 }
 
@@ -372,8 +371,7 @@ void binary_t::remove(pe_parser::section_header_t* section)
 
 	if (section_index == -1)
 	{
-		fprintf(stderr, "[ERROR] Section %s not found\n", section->name());
-		fprintf(logfile, "[ERROR] Section %s not found\n", section->name());
+		ANBU::LOGGER_ERROR(logfile, "Section %s not found\n", section->name());
 		return;
 	}
 
@@ -400,8 +398,8 @@ void binary_t::make_space_for_new_section(void)
 {
 	const uint32_t shift = static_cast<uint32_t>(LIEF::align(sizeof(pe_section), this->optional_header()->file_alignment()));
 
-	fprintf(stderr, "[INFO] Making space for a new section header\n");
-	fprintf(stderr, "[INFO] Shifting all sections by 0x%x", shift);
+	ANBU::LOGGER_INFO("Making space for a new section header\n");
+	ANBU::LOGGER_INFO("Shifting all sections by 0x%x", shift);
 
 	for (size_t i = 0; i < this->section_table_header_.size(); i++)
 	{
@@ -576,7 +574,7 @@ pe_parser::section_header_t* binary_t::add_section(pe_parser::section_header_t* 
 		 this->optional_header_->file_alignment()
 	);
 
-	fprintf(stderr, "[INFO] New section offset: 0x%x\n", static_cast<unsigned int>(new_section_offset));
+	ANBU::LOGGER_INFO("New section offset: 0x%x\n", static_cast<unsigned int>(new_section_offset)); 
 
 	// Compute new section virtual address
 	const uint64_t new_section_va = LIEF::align(
@@ -584,8 +582,8 @@ pe_parser::section_header_t* binary_t::add_section(pe_parser::section_header_t* 
 		 this->section_table_header_[this->section_table_header_.size() - 1].virtual_size()),
 		 this->optional_header_->section_alignment()
 	);
-
-	fprintf(stderr, "[INFO] New section va: 0x%x\n", static_cast<unsigned int>(new_section_va));
+	
+	ANBU::LOGGER_INFO("New section va: 0x%x\n", static_cast<unsigned int>(new_section_va));
 
 	if (new_section->pointerto_raw_data() == 0)
 		new_section->pointerto_raw_data(static_cast<uint32_t>(new_section_offset));
@@ -601,7 +599,7 @@ pe_parser::section_header_t* binary_t::add_section(pe_parser::section_header_t* 
 
 	if (this->section_table_header_.size() >= MaxNumberOfSections16)
 	{
-		fprintf(stderr, "[ERROR] Binary reachs its maximum number of sectiosn");
+		ANBU::LOGGER_ERROR("Binary reachs its maximum number of sections");
 		return nullptr;
 	}
 
@@ -708,8 +706,7 @@ bool binary_t::calculate_initial_entropy(void)
 	{
 		initial_entropies[i] = calculate_entropy_section(section_table_header_[i]);
 
-		fprintf(stderr, "[INFO] Entropy for section in RVA 0x%x - %f\n", section_table_header_[i].virtual_address(), initial_entropies[i]);
-		fprintf(logfile, "[INFO] Entropy for section in RVA 0x%x - %f\n", section_table_header_[i].virtual_address(), initial_entropies[i]);
+		ANBU::LOGGER_INFO(logfile, "Entropy for section in RVA 0x%x - %f\n", section_table_header_[i].virtual_address(), initial_entropies[i]);
 	}
 	
 	return true;
@@ -724,12 +721,12 @@ bool binary_t::parse(void)
 	if (!this->parse_dos_stub())
 		return false;
 
-	fprintf(stderr, "[INFO] Decomposing Sections\n");
+	ANBU::LOGGER_INFO("Decomposing Sections\n");
 
 	if (!this->parse_sections())
 		return false;
 
-	fprintf(stderr, "[INFO] Decomposing Data directories\n");
+	ANBU::LOGGER_INFO("Decomposing Data directories\n");
 	if (!this->parse_data_directories())
 		return false;
 
@@ -756,15 +753,13 @@ bool binary_t::parse_headers(void)
 
 	if (copied_data != data_to_copy)
 	{
-		fprintf(stderr, "[ERROR] dos header corrupted\n");
-		fprintf(logfile, "[ERROR] dos header corrupted\n");
+		ANBU::LOGGER_ERROR(logfile, "Dos header corrupted\n");
 		return false;
 	}
 
 	if (dos_header_struct.Magic != mz_signature)
 	{
-		fprintf(stderr, "[ERROR] dos header not correct\n");
-		fprintf(logfile, "[ERROR] dos header not correct\n");
+		ANBU::LOGGER_ERROR(logfile, "Dos header not correct\n");
 		return false;
 	}
 
@@ -783,15 +778,13 @@ bool binary_t::parse_headers(void)
 
 	if (copied_data != data_to_copy)
 	{
-		fprintf(stderr, "[ERROR] pe header corrupted\n");
-		fprintf(logfile, "[ERROR] pe header corrupted\n");
+		ANBU::LOGGER_ERROR(logfile, "PE header corrupted\n");
 		return false;
 	}
 	
 	if (pe_header.signature != correct_pe_signature_k)
 	{
-		fprintf(stderr, "[ERROR] pe header not correct\n");
-		fprintf(logfile, "[ERROR] pe header not correct\n");
+		ANBU::LOGGER_ERROR(logfile, "PE header not correct\n");
 		return false;
 	}
 
@@ -811,8 +804,7 @@ bool binary_t::parse_headers(void)
 
 	if (copied_data != data_to_copy)
 	{
-		fprintf(stderr, "[ERROR] optional header corrupted\n");
-		fprintf(logfile, "[ERROR] optional header corupted\n");
+		ANBU::LOGGER_ERROR(logfile, "Optional header corupted\n");
 		return false;
 	}
 
@@ -829,8 +821,7 @@ bool binary_t::parse_headers(void)
 	
 	if (copied_data != data_to_copy)
 	{
-		fprintf(stderr, "[ERROR] optional header corrupted\n");
-		fprintf(logfile, "[ERROR] optional header corupted\n");
+		ANBU::LOGGER_ERROR(logfile, "Optional header corupted\n");
 		return false;
 	}
 
@@ -856,7 +847,7 @@ bool binary_t::parse_dos_stub(void)
 
 	size_t copied_data;
 
-	fprintf(stderr, "[INFO] Size of dos stub: %llu\n", sizeof_dos_stub);
+	ANBU::LOGGER_INFO("Size of dos stub: %llu\n", sizeof_dos_stub);
 
 	if (dos_header_->addressof_new_exeheader() < sizeof(pe_parser::dos_header_t))
 		return true;
@@ -866,8 +857,7 @@ bool binary_t::parse_dos_stub(void)
 
 	if (dos_stub_ == nullptr)
 	{
-		fprintf(stderr, "[ERROR] DOS Stub corrupted\n");
-		fprintf(logfile, "[ERROR] DOS Stub corrupted\n");
+		ANBU::LOGGER_ERROR(logfile, "DOS Stub corrupted\n");
 		return false;
 	}
 	else
@@ -876,9 +866,7 @@ bool binary_t::parse_dos_stub(void)
 
 		if (copied_data != sizeof_dos_stub)
 		{
-			fprintf(stderr, "[ERROR] dos stub not correct\n");
-			fprintf(logfile, "[ERROR] dos stub not correct\n");
-
+			ANBU::LOGGER_ERROR(logfile, "Dos stub not correct\n");
 			return false;
 		}
 	}
@@ -901,7 +889,7 @@ bool binary_t::parse_data_directories(void)
 	pe_data_directory data_directory_struct;
 	pe_parser::data_directory_header_t *data_directory;
 
-	fprintf(logfile, "============== DATA DIRECTORY HEADERS ==============");
+	ANBU::LOGGER(logfile, "============== DATA DIRECTORY HEADERS ==============\n");
 
 	for (size_t i = 0; i < nbof_datadir; i++)
 	{
@@ -909,16 +897,15 @@ bool binary_t::parse_data_directories(void)
 
 		if (copied_data != sizeof(pe_data_directory))
 		{
-			fprintf(stderr,  "[ERROR] Data Directory corrupted\n");
-			fprintf(logfile, "[ERROR] Data Directory corrupted\n");
+			ANBU::LOGGER_ERROR(logfile, "Data Directory corrupted\n");
 			return false;
 		}
 
 		data_directory = new pe_parser::data_directory_header_t(&data_directory_struct, static_cast<DATA_DIRECTORY>(i));
-
-		fprintf(stderr, "[INFO] Processing Directory: %s\n", data_directory->directory_names[static_cast<DATA_DIRECTORY>(i)].c_str());
-		fprintf(stderr, "[INFO] RVA: %x\n", data_directory->RVA());
-		fprintf(stderr, "[INFO] Size: %x\n", data_directory->size());
+		ANBU::LOGGER(logfile, "============");
+		ANBU::LOGGER_INFO("Processing Directory: %s\n", data_directory->directory_names[static_cast<DATA_DIRECTORY>(i)].c_str());
+		ANBU::LOGGER_INFO("RVA: %x\n", data_directory->RVA());
+		ANBU::LOGGER_INFO("Size: %x\n", data_directory->size());
 
 		data_directory->dump_directories(logfile);
 
@@ -931,7 +918,7 @@ bool binary_t::parse_data_directories(void)
 
 bool binary_t::parse_sections(void)
 {
-	fprintf(stdout, "[INFO] Parsing Sections\n");
+	ANBU::LOGGER_INFO("Parsing Sections\n");
 
 	const ADDRINT section_offset =
 		this->binary_base_address +
@@ -947,7 +934,7 @@ bool binary_t::parse_sections(void)
 	pe_section pe_section_;
 	pe_parser::section_header_t *section_header_;
 
-	fprintf(logfile, "============== SECTION HEADERS ==============");
+	ANBU::LOGGER(logfile, "============== SECTION HEADERS ==============\n");
 
 	for (size_t i = 0; i < numberof_sections; i++)
 	{
@@ -955,12 +942,13 @@ bool binary_t::parse_sections(void)
 
 		if (copied_data != sizeof(pe_section))
 		{
-			fprintf(stderr, "[ERROR] Secion table corrupted\n");
-			fprintf(logfile, "[ERROR] Secion table corrupted\n");
+			ANBU::LOGGER_ERROR(logfile, "Secion table corrupted\n");
 			return false;
 		}
 
 		section_header_ = new pe_parser::section_header_t(&pe_section_);
+		
+		ANBU::LOGGER(logfile, "============");
 
 		section_header_->dump_sections(logfile);
 
@@ -1244,7 +1232,7 @@ lief_import_t* binary_t::add_library(const std::string& name)
 
 void binary_t::remove_library(const std::string& name)
 {
-	fprintf(stderr, "[ERROR] Not implemented yet\n");
+	ANBU::LOGGER_ERROR("Remove Library not implemented yet\n");
 	return;
 }
 
@@ -1270,7 +1258,7 @@ uint32_t binary_t::predict_function_rva(const std::string& library, const std::s
 
 	if (index_import == -1)
 	{
-		fprintf(stderr, "[ERROR] Unable to find library '%s'\n", library.c_str());
+		ANBU::LOGGER_ERROR("Unable to find library '%s'\n", library.c_str());
 		return 0;
 	}
 
@@ -1286,13 +1274,13 @@ uint32_t binary_t::predict_function_rva(const std::string& library, const std::s
 
 	if (nb_functions == 0)
 	{
-		fprintf(stderr, "[ERROR] Unable to find function '%s' in '%s' library\n", function.c_str(), library.c_str());
+		ANBU::LOGGER_ERROR("Unable to find function '%s' in '%s' library\n", function.c_str(), library.c_str());
 		return 0;
 	}
 
 	if (nb_functions > 1)
 	{
-		fprintf(stderr, "[ERROR] '%s' function is defined more than once in '%s' library\n", function.c_str(), library.c_str());
+		ANBU::LOGGER_ERROR("'%s' function is defined more than once in '%s' library\n", function.c_str(), library.c_str());
 		return 0;
 	}
 

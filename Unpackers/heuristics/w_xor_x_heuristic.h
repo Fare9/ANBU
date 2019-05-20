@@ -3,7 +3,7 @@
 #define W_XOR_X_HEURISTIC_H
 
 #include "common.h"
-
+#include "utils.h"
 
 class w_xor_x_heuristic_t
 {

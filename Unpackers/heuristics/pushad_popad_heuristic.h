@@ -4,6 +4,7 @@
 #define PUSHAD_POPAD_HEURISTIC_H
 
 #include "common.h"
+#include "utils.h"
 
 class pushad_popad_heuristic_t
 {

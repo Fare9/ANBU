@@ -350,24 +350,24 @@ namespace pe_parser
 	{
 		if (!dos_header_correct)
 			return false;
-		fprintf(file_to_dump, "================== DUMP DOS HEADER ===================\n");
-		fprintf(file_to_dump, "\t+Magic: 0x%x\n", magic_);
-		fprintf(file_to_dump, "\t+Used Bytes In The LastPage: 0x%x\n", usedBytesInTheLastPage_);
-		fprintf(file_to_dump, "\t+File Size In Pages: 0x%x\n", fileSizeInPages_);
-		fprintf(file_to_dump, "\t+Number Of Relocation: 0x%x\n", numberOfRelocation_);
-		fprintf(file_to_dump, "\t+Header Size In Paragraphs: 0x%x\n", headerSizeInParagraphs_);
-		fprintf(file_to_dump, "\t+Minimum Extra Paragraphs: 0x%x\n", minimumExtraParagraphs_);
-		fprintf(file_to_dump, "\t+Maximum Extra Paragraphs: 0x%x\n", maximumExtraParagraphs_);
-		fprintf(file_to_dump, "\t+Initial Relative SS: 0x%x\n", initialRelativeSS_);
-		fprintf(file_to_dump, "\t+Initial SP: 0x%x\n", initialSP_);
-		fprintf(file_to_dump, "\t+Checksum: 0x%x\n", checksum_);
-		fprintf(file_to_dump, "\t+Initial IP: 0x%x\n", initialIP_);
-		fprintf(file_to_dump, "\t+Initial Relative CS: 0x%x\n", initialRelativeCS_);
-		fprintf(file_to_dump, "\t+Address Of Relocation Table: 0x%x\n", addressOfRelocationTable_);
-		fprintf(file_to_dump, "\t+Overlay Number: 0x%x\n", overlayNumber_);
-		fprintf(file_to_dump, "\t+OEM id: 0x%x\n", oEMid_);
-		fprintf(file_to_dump, "\t+OEM info: 0x%x\n", oEMinfo_);
-		fprintf(file_to_dump, "\t+Address Of New Exe Header: 0x%x\n", addressOfNewExeHeader_);
+		ANBU::LOGGER(file_to_dump, "================== DUMP DOS HEADER ===================\n");
+		ANBU::LOGGER(file_to_dump, "\t+Magic: 0x%x\n", magic_);
+		ANBU::LOGGER(file_to_dump, "\t+Used Bytes In The LastPage: 0x%x\n", usedBytesInTheLastPage_);
+		ANBU::LOGGER(file_to_dump, "\t+File Size In Pages: 0x%x\n", fileSizeInPages_);
+		ANBU::LOGGER(file_to_dump, "\t+Number Of Relocation: 0x%x\n", numberOfRelocation_);
+		ANBU::LOGGER(file_to_dump, "\t+Header Size In Paragraphs: 0x%x\n", headerSizeInParagraphs_);
+		ANBU::LOGGER(file_to_dump, "\t+Minimum Extra Paragraphs: 0x%x\n", minimumExtraParagraphs_);
+		ANBU::LOGGER(file_to_dump, "\t+Maximum Extra Paragraphs: 0x%x\n", maximumExtraParagraphs_);
+		ANBU::LOGGER(file_to_dump, "\t+Initial Relative SS: 0x%x\n", initialRelativeSS_);
+		ANBU::LOGGER(file_to_dump, "\t+Initial SP: 0x%x\n", initialSP_);
+		ANBU::LOGGER(file_to_dump, "\t+Checksum: 0x%x\n", checksum_);
+		ANBU::LOGGER(file_to_dump, "\t+Initial IP: 0x%x\n", initialIP_);
+		ANBU::LOGGER(file_to_dump, "\t+Initial Relative CS: 0x%x\n", initialRelativeCS_);
+		ANBU::LOGGER(file_to_dump, "\t+Address Of Relocation Table: 0x%x\n", addressOfRelocationTable_);
+		ANBU::LOGGER(file_to_dump, "\t+Overlay Number: 0x%x\n", overlayNumber_);
+		ANBU::LOGGER(file_to_dump, "\t+OEM id: 0x%x\n", oEMid_);
+		ANBU::LOGGER(file_to_dump, "\t+OEM info: 0x%x\n", oEMinfo_);
+		ANBU::LOGGER(file_to_dump, "\t+Address Of New Exe Header: 0x%x\n", addressOfNewExeHeader_);
 
 		return true;
 	}

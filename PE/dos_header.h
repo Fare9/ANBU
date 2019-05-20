@@ -4,6 +4,7 @@
 #define DOS_HEADER_H
 
 #include "common.h"
+#include "utils.h"
 #include "structures_and_enums.h"
 
 namespace pe_parser

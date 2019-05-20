@@ -237,16 +237,16 @@ namespace pe_parser
 
 	bool section_header_t::dump_sections(FILE *output_file)
 	{
-		fprintf(output_file, "\t+Name: %s\n", name_.c_str());
-		fprintf(output_file, "\t+Virtual Size: 0x%x\n", this->virtualSize_);
-		fprintf(output_file, "\t+Virtual Address: 0x%x\n", this->virtual_address_);
-		fprintf(output_file, "\t+Pointer to Raw Data: 0x%x\n", this->offset_);
-		fprintf(output_file, "\t+Size of Raw Data: 0x%x\n", this->size_);
-		fprintf(output_file, "\t+Pointer to relocations: 0x%x\n", this->pointerToRelocations_);
-		fprintf(output_file, "\t+Pointer to line numbers: 0x%x\n", this->pointerToLineNumbers_);
-		fprintf(output_file, "\t+Number of relocations: 0x%x\n", this->numberOfRelocations_);
-		fprintf(output_file, "\t+Number of line numbers: 0x%x\n", this->numberOfLineNumbers_);
-		fprintf(output_file, "\t+Characteristics: 0x%x\n", this->characteristics_);
+		ANBU::LOGGER(output_file, "\t+Name: %s\n", name_.c_str());
+		ANBU::LOGGER(output_file, "\t+Virtual Size: 0x%x\n", this->virtualSize_);
+		ANBU::LOGGER(output_file, "\t+Virtual Address: 0x%x\n", this->virtual_address_);
+		ANBU::LOGGER(output_file, "\t+Pointer to Raw Data: 0x%x\n", this->offset_);
+		ANBU::LOGGER(output_file, "\t+Size of Raw Data: 0x%x\n", this->size_);
+		ANBU::LOGGER(output_file, "\t+Pointer to relocations: 0x%x\n", this->pointerToRelocations_);
+		ANBU::LOGGER(output_file, "\t+Pointer to line numbers: 0x%x\n", this->pointerToLineNumbers_);
+		ANBU::LOGGER(output_file, "\t+Number of relocations: 0x%x\n", this->numberOfRelocations_);
+		ANBU::LOGGER(output_file, "\t+Number of line numbers: 0x%x\n", this->numberOfLineNumbers_);
+		ANBU::LOGGER(output_file, "\t+Characteristics: 0x%x\n", this->characteristics_);
 
 		return true;
 	}

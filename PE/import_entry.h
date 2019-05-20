@@ -3,6 +3,7 @@
 #define IMPORTENTRY_H
 
 #include "common.h"
+#include "utils.h"
 #include "structures_and_enums.h"
 
 class import_entry_t

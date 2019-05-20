@@ -2,6 +2,7 @@
 *   Compile: make PIN_ROOT="<path_to_pin>"
 */
 #include "unpacker.h"
+#include "utils.h"
 
 
 FILE*				logfile; // log file handler
@@ -64,11 +65,8 @@ EXCEPT_HANDLING_RESULT ExceptionHandler(THREADID tid, EXCEPTION_INFO *pExceptInf
 	EXCEPTION_CODE c = PIN_GetExceptionCode(pExceptInfo);
 	EXCEPTION_CLASS cl = PIN_GetExceptionClass(c);
 
-	fprintf(stderr, "Exception class: 0x%x\n", (unsigned int)cl);
-	fprintf(logfile, "Exception class: 0x%x\n", (unsigned int)cl);
-
-	fprintf(stderr,"Exception string: %s\n", PIN_ExceptionToString(pExceptInfo).c_str());
-	fprintf(logfile, "Exception string: %s\n", PIN_ExceptionToString(pExceptInfo).c_str());
+	ANBU::LOGGER_ERROR(logfile, "Exception class: 0x%x\n", (unsigned int)cl);
+	ANBU::LOGGER_ERROR(logfile, "Exception string: %s\n", PIN_ExceptionToString(pExceptInfo).c_str());
 
 	return EHR_CONTINUE_SEARCH;
 }
@@ -77,7 +75,6 @@ int main(int argc, char *argv[])
 {
 	WINDOWS::DWORD tick_count1, tick_count2;
 
-	fprintf(stderr, "+--<<< ANBU by F9 >>>>--+\n");
 	/*
 	*	As we will use symbols...
 	*/
@@ -102,11 +99,11 @@ int main(int argc, char *argv[])
 	}
 
 	// open log file to append
-	fprintf(stderr, "[INFO] File name: %s\n", KnobLogFile.Value().c_str());
+	ANBU::LOGGER_INFO("File name: %s\n", KnobLogFile.Value().c_str());
 	logfile = fopen(KnobLogFile.Value().c_str(), "w");
 	if (!logfile)
 	{
-		fprintf(stderr, "[ERROR] failed to open '%s'\n", KnobLogFile.Value().c_str());
+		ANBU::LOGGER_ERROR("Failed to open '%s'\n", KnobLogFile.Value().c_str());
 		return 1;
 	}
 
@@ -118,17 +115,15 @@ int main(int argc, char *argv[])
 
 	if (import_section_name.size() > 8)
 	{
-		fprintf(stderr, "Name cannot be greater than 8 characters");
+		ANBU::LOGGER_ERROR("Name cannot be greater than 8 characters");
 		return -1;
 	}
 
 	PIN_AddInternalExceptionHandler(ExceptionHandler, NULL);
 
-	fprintf(logfile, "+--<<< ANBU by F9 >>>>--+\n");
-
-	fprintf(stderr, "------ unpacking binary ------\n");
-	fprintf(logfile, "------ unpacking binary ------\n");
-
+	ANBU::LOGGER(logfile,"+--<<< ANBU by F9 >>>>--+\n");
+	ANBU::LOGGER(logfile, "------ unpacking binary ------\n");
+	
 	enum_syscalls();
 
 	init_common_syscalls();
@@ -174,12 +169,12 @@ int main(int argc, char *argv[])
 
 void usage()
 {
-	fprintf(stderr, "[ERROR] Parameters error, please check next help line(s)\n");
-	fprintf(stderr, "pin -t <pintool_path> [-l <logname>] -- application\n");
-	fprintf(stderr, "Commands: \n");
-	fprintf(stderr, "\t+ -t <pintool_path> (MANDATORY): necessary flag for PIN to specify a pintool\n");
-	fprintf(stderr, "\t+ -l <logname> (OPTIONAL): specify name for a log file\n");
-	fprintf(stderr, "\t+ -d true (OPTIONAL): start debug mode\n");
-	fprintf(stderr, "\t+ -n <unpacked file name> (OPTIONAL): name for unpacked file\n");
-	fprintf(stderr, "\n");
+	ANBU::LOGGER_ERROR("Parameters error, please check next help line(s)\n");
+	ANBU::LOGGER("pin -t <pintool_path> [-l <logname>] -- application\n");
+	ANBU::LOGGER("Commands: \n");
+	ANBU::LOGGER("\t+ -t <pintool_path> (MANDATORY): necessary flag for PIN to specify a pintool\n");
+	ANBU::LOGGER("\t+ -l <logname> (OPTIONAL): specify name for a log file\n");
+	ANBU::LOGGER("\t+ -d true (OPTIONAL): start debug mode\n");
+	ANBU::LOGGER("\t+ -n <unpacked file name> (OPTIONAL): name for unpacked file\n");
+	ANBU::LOGGER("\n");
 }

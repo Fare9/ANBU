@@ -4,6 +4,7 @@
 #define MEMORY_DUMPER_H
 
 #include "common.h"
+#include "utils.h"
 #include "structures_and_enums.h"
 
 #include "binary.h"

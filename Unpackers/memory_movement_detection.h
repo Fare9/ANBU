@@ -7,6 +7,7 @@
 #include "generic_instrumentation.h"
 #include "w_xor_x_heuristic.h"
 #include "pushad_popad_heuristic.h"
+#include "utils.h"
 
 // PE Headers
 #include "binary.h"

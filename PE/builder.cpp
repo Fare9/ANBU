@@ -37,10 +37,8 @@ builder_t::builder_t(ADDRINT jump_target, binary_t* binary) :
 
 	this->address_code_to_dump -= base_address_to_dump;
 
-	fprintf(stderr,		"[INFO] Address of code to dump: 0x%x\n", (uintptr_t)jump_target);
-	fprintf(logfile,	"[INFO] Address of code to dump: 0x%x\n", (uintptr_t)jump_target);
-	fprintf(stderr,		"[INFO] Base address of that image: 0x%x\n", (uintptr_t)base_address_to_dump);
-	fprintf(logfile,	"[INFO] Base address of that image: 0x%x\n", (uintptr_t)base_address_to_dump);
+	ANBU::LOGGER_INFO(logfile, "Address of code to dump: 0x%x\n", (uintptr_t)jump_target);
+	ANBU::LOGGER_INFO(logfile, "Base address of that image: 0x%x\n", (uintptr_t)base_address_to_dump);
 }
 
 builder_t::builder_t(std::vector<uint8_t> file_base_in_vector, binary_t* binary) : 
@@ -59,8 +57,7 @@ builder_t::builder_t(std::vector<uint8_t> file_base_in_vector, binary_t* binary)
 	this->address_code_to_dump = 0;
 	base_address_to_dump = (ADDRINT) this->data_from_vector.begin();
 
-	fprintf(stderr, "[INFO] Base address of that image: 0x%x\n", (uintptr_t)base_address_to_dump);
-	fprintf(logfile, "[INFO] Base address of that image: 0x%x\n", (uintptr_t)base_address_to_dump);
+	ANBU::LOGGER_INFO(logfile, "Base address of that image: 0x%x\n", (uintptr_t)base_address_to_dump);
 }
 
 
@@ -92,8 +89,7 @@ bool builder_t::dump_pe_to_file(const std::string& file_name)
 		return false;
 
 	this->binary_->realign_pe();
-	fprintf(stderr, "[INFO] PE realigned\n");
-	fprintf(logfile, "[INFO] PE realigned\n");
+	ANBU::LOGGER_INFO(logfile, "PE realigned\n");
 
 	// set the new entry point, as the one from the header
 	// will be packer's entry point.
@@ -119,10 +115,7 @@ bool builder_t::dump_pe_to_file(const std::string& file_name)
 		1, 
 		dumped_file);
 
-	fprintf(stderr, "[INFO] Written new import table into the raw pointer: 0x%x; virtual address: 0x%x\n",
-		binary_->section_table_header().at(binary_->section_table_header().size() - 1).pointerto_raw_data(),
-		binary_->section_table_header().at(binary_->section_table_header().size() - 1).virtual_address());
-	fprintf(logfile, "[INFO] Written new import table into the raw pointer: 0x%x; virtual address: 0x%x\n",
+	ANBU::LOGGER_INFO(logfile, "Written new import table into the raw pointer: 0x%x; virtual address: 0x%x\n",
 		binary_->section_table_header().at(binary_->section_table_header().size() - 1).pointerto_raw_data(),
 		binary_->section_table_header().at(binary_->section_table_header().size() - 1).virtual_address());
 
@@ -130,8 +123,7 @@ bool builder_t::dump_pe_to_file(const std::string& file_name)
 		return false;
 
 	// write again the headers
-	fprintf(stderr, "[INFO] Writing headers, now with the import section\n");
-	fprintf(logfile, "[INFO] Writing headers, now with the import section\n");
+	ANBU::LOGGER_INFO(logfile, "Writing headers, now with the import section\n");
 	if (!dump_headers())
 		return false;
 
@@ -173,9 +165,7 @@ bool builder_t::dump_runpe_to_file(const std::string& file_name, std::vector<wri
 	{
 		index_section = -1;
 
-		fprintf(stderr, "[INFO] Trying to dump the section with RVA 0x%x and raw size 0x%x\n", 
-			sections.at(j).virtual_address(), sections.at(j).sizeof_raw_data());
-		fprintf(logfile, "[INFO] Trying to dump the section with RVA 0x%x and raw size 0x%x\n",
+		ANBU::LOGGER_INFO(logfile, "Trying to dump the section with RVA 0x%x and raw size 0x%x\n",
 			sections.at(j).virtual_address(), sections.at(j).sizeof_raw_data());
 
 		for (size_t i = 0; i < file_data.size(); i++)
@@ -300,7 +290,7 @@ void builder_t::build_import_table(void)
 	//uint32_t trampolines_offset = libraries_name_offset + libraries_name_size;
 
 	// Create empty content of the required size and align it
-	fprintf(stderr, "Libraries name offset 0x%x libraries name size 0x%x\n", libraries_name_offset, libraries_name_size);
+	ANBU::LOGGER("Libraries name offset 0x%x libraries name size 0x%x\n", libraries_name_offset, libraries_name_size);
 	size_t new_section_size = libraries_name_offset + libraries_name_size;
 	std::vector<uint8_t> content(new_section_size, 0);
 	size_t raw_size_aligned = static_cast<size_t>(LIEF::align(content.size(), this->binary_->optional_header()->file_alignment()));
@@ -344,7 +334,7 @@ void builder_t::build_import_table(void)
 
 		// Copy the library name in the "string section"
 
-		fprintf(stderr, "[INFO] Adding to import section library name '%s'\n", this->binary_->imports().at(i).name().c_str());
+		ANBU::LOGGER_INFO("Adding to import section library name '%s'\n", this->binary_->imports().at(i).name().c_str());
 
 		strcpy(reinterpret_cast<char*>(content.begin() + libraries_name_offset), this->binary_->imports().at(i).name().c_str());
 
@@ -431,14 +421,13 @@ bool builder_t::dump_headers()
 	// Write DOS Header
 	pe_dos_header dos_header = this->binary_->dos_header()->dos_header();
 
-	fprintf(stderr, "[INFO] Writing to file dos header\n");
-	fprintf(logfile, "[INFO] Writing to file dos header\n");
+	ANBU::LOGGER_INFO(logfile, "Writing to file dos header\n");
+
 	written_bytes = fwrite(&dos_header, sizeof(pe_dos_header), 1, dumped_file);
 
 	if (!written_bytes)
 	{
-		fprintf(stderr, "[ERROR] not possible to write dos header\n");
-		fprintf(logfile, "[ERROR] not possible to write dos header\n");
+		ANBU::LOGGER_ERROR(logfile, "Not possible to write dos header\n");
 		return false;
 	}
 
@@ -449,9 +438,7 @@ bool builder_t::dump_headers()
 	{
 		size_t dos_stub_size = this->binary_->dos_header()->addressof_new_exeheader() - sizeof(pe_dos_header);
 
-		fprintf(stderr, "[INFO] Writing to file dos stub\n");
-		fprintf(logfile, "[INFO] Writing to file dos stub\n");
-
+		ANBU::LOGGER_INFO(logfile, "Writing to file dos stub\n");
 
 		written_bytes = fwrite(dos_stub, dos_stub_size, 1, dumped_file);
 		
@@ -459,8 +446,7 @@ bool builder_t::dump_headers()
 		{
 			if (!written_bytes)
 			{
-				fprintf(stderr, "[ERROR] not possible to write dos stub\n");
-				fprintf(logfile, "[ERROR] not possible to write dos stub\n");
+				ANBU::LOGGER_ERROR(logfile, "Not possible to write dos stub\n");
 				return false;
 			}
 		}
@@ -473,22 +459,18 @@ bool builder_t::dump_headers()
 	// PE Header
 	pe_header nt_header = this->binary_->nt_coff_header()->nt_header();
 
-	fprintf(stderr, "[INFO] Writing to file nt header\n");
-	fprintf(logfile, "[INFO] Writing to file nt header\n");
+	ANBU::LOGGER_INFO(logfile, "Writing to file nt header\n");
 	written_bytes = fwrite(&nt_header, sizeof(pe_header), 1, dumped_file);
 
 	if (!written_bytes)
 	{
-		fprintf(stderr, "[ERROR] not possible to write nt header\n");
-		fprintf(logfile, "[ERROR] not possible to write nt header\n");
+		ANBU::LOGGER_ERROR(logfile, "Not possible to write nt header\n");
 		return false;
 	}
 
 
 	// Optional Header
-	fprintf(stderr, "[INFO] Writing to file optional header\n");
-	fprintf(logfile, "[INFO] Writing to file optional header\n");
-
+	ANBU::LOGGER_INFO(logfile, "Writing to file optional header\n");
 
 	if (this->binary_->optional_header()->is_64_bit_binary())
 	{
@@ -513,14 +495,12 @@ bool builder_t::dump_headers()
 
 	if (!written_bytes)
 	{
-		fprintf(stderr, "[ERROR] not possible to write optional header\n");
-		fprintf(logfile, "[ERROR] not possible to write optional header\n");
+		ANBU::LOGGER_ERROR(logfile, "Not possible to write optional header\n");
 		return false;
 	}
 
 	// Write Data directories
-	fprintf(stderr, "[INFO] Writing to file data directories\n");
-	fprintf(logfile, "[INFO] Writing to file data directories\n");
+	ANBU::LOGGER_INFO(logfile, "Writing to file data directories\n");
 
 	for (i = 0; i < this->binary_->optional_header()->numberof_rva_and_size(); i++)
 	{
@@ -535,15 +515,13 @@ bool builder_t::dump_headers()
 
 		if (!written_bytes)
 		{
-			fprintf(stderr, "[ERROR] not possible to write data directories\n");
-			fprintf(logfile, "[ERROR] not possible to write data directories\n");
+			ANBU::LOGGER_ERROR(logfile, "Not possible to write data directories\n");
 			return false;
 		}
 	}
 
 	// Write Section Headers
-	fprintf(stderr, "[INFO] Writing to file section header\n");
-	fprintf(logfile, "[INFO] Writing to file section header\n");
+	ANBU::LOGGER_INFO(logfile, "Writing to file section header\n");
 
 	for (i = 0; i < this->binary_->nt_coff_header()->numberof_sections(); i++)
 	{
@@ -557,8 +535,7 @@ bool builder_t::dump_headers()
 
 		if (!written_bytes)
 		{
-			fprintf(stderr, "[ERROR] not possible to write section header\n");
-			fprintf(logfile, "[ERROR] not possible to write section header\n");
+			ANBU::LOGGER_ERROR(logfile, "Not possible to write section header\n");
 			return false;
 		}
 	}
@@ -582,14 +559,10 @@ bool builder_t::dump_sections()
 		bytes_to_write = this->binary_->section_table_header().at(i).sizeof_raw_data();
 		address_to_read = base_address_to_dump + this->binary_->section_table_header().at(i).virtual_address();
 
-		fprintf(stderr, "[INFO] Section virtual address: 0x%x, size of raw data: 0x%x, pointer to raw data: 0x%x\n", 
-																													address_to_read, 
-																													bytes_to_write, 
-																													this->binary_->section_table_header().at(i).pointerto_raw_data());
-		fprintf(logfile, "[INFO] Section virtual address: 0x%x, size of raw data: 0x%x, pointer to raw data: 0x%x\n", 
-																													address_to_read,
-																													bytes_to_write,
-																													this->binary_->section_table_header().at(i).pointerto_raw_data());
+		ANBU::LOGGER_INFO(logfile, "Section virtual address: 0x%x, size of raw data: 0x%x, pointer to raw data: 0x%x\n",
+			address_to_read,
+			bytes_to_write,
+			this->binary_->section_table_header().at(i).pointerto_raw_data());
 
 		if (fseek(dumped_file, this->binary_->section_table_header().at(i).pointerto_raw_data(), SEEK_SET))
 			return false;
@@ -674,14 +647,14 @@ void builder_t::clean_list()
 			imports.at(i).name(name_i);
 			imports.at(j).name(name_j);
 
-			fprintf(stderr, "[INFO] Testing %s and %s with i = %d and j = %d\n", imports.at(i).name().c_str(), imports.at(j).name().c_str(), i, j);
+			ANBU::LOGGER_INFO("Testing %s and %s with i = %d and j = %d\n", imports.at(i).name().c_str(), imports.at(j).name().c_str(), i, j);
 			
 			if ((i != j) && (imports.at(i).name() == imports.at(j).name()))
 			{
 				if ((imports.at(i).import_address_table_rva() < imports.at(j).import_address_table_rva()) &&
 					(imports.at(j).import_address_table_rva() < (imports.at(i).import_address_table_rva() + (imports.at(i).entries().size() * sizeof(ADDRINT)) )))
 				{
-					fprintf(stderr, "[INFO] Deleting: %d\n", j);
+					ANBU::LOGGER_INFO("Deleting: %d\n", j);
 					imports.erase(imports.begin() + j);
 					i = -1;
 					break;
@@ -689,7 +662,7 @@ void builder_t::clean_list()
 				else if ((imports.at(j).import_address_table_rva() < imports.at(i).import_address_table_rva()) &&
 					(imports.at(i).import_address_table_rva() < (imports.at(j).import_address_table_rva() + (imports.at(j).entries().size() * sizeof(ADDRINT)))))
 				{
-					fprintf(stderr, "[INFO] Deleting: %d\n", i);
+					ANBU::LOGGER_INFO("Deleting: %d\n", i);
 					imports.erase(imports.begin() + i);
 					i = -1;
 					break;

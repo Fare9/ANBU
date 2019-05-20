@@ -86,7 +86,7 @@ const import_entry_t* lief_import_t::get_entry(const std::string& name) const
 		}
 	}
 
-	fprintf(stderr, "[ERROR] Unable to find entry '%s'\n", name.c_str());
+	ANBU::LOGGER_ERROR("Unable to find entry '%s'\n", name.c_str());
 	return nullptr;
 }
 
@@ -136,7 +136,7 @@ uint32_t lief_import_t::get_function_rva_from_iat(const std::string& function) c
 
 	if (idx == -1)
 	{
-		fprintf(stderr, "[ERROR] Function not found");
+		ANBU::LOGGER_ERROR("Function not found\n");
 		return -1;
 	}
 
@@ -228,11 +228,11 @@ uint32_t lief_import_t::timedatestamp(void) const
 
 bool lief_import_t::dump_import(FILE *output_file)
 {
-	fprintf(output_file, "%s\n", this->name_.c_str());
-	fprintf(output_file, "%x\n", this->import_lookup_table_RVA_);
-	fprintf(output_file, "%x\n", this->import_address_table_RVA_);
-	fprintf(output_file, "%x\n", this->forwarder_chain_);
-	fprintf(output_file, "%x\n", this->timedatestamp_);
+	ANBU::LOGGER(output_file, "%s\n", this->name_.c_str());
+	ANBU::LOGGER(output_file, "%s\n", this->import_lookup_table_RVA_);
+	ANBU::LOGGER(output_file, "%x\n", this->import_address_table_RVA_);
+	ANBU::LOGGER(output_file, "%x\n", this->forwarder_chain_);
+	ANBU::LOGGER(output_file, "%x\n", this->timedatestamp_);
 
 	for (size_t i = 0; i < this->entries_.size(); i++)
 		this->entries_.at(i).dump_import_entry(output_file);

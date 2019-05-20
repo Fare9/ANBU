@@ -3,6 +3,7 @@
 #define IMPORT_H
 
 #include "common.h"
+#include "utils.h"
 #include "structures_and_enums.h"
 #include "import_entry.h"
 #include "data_directory_header.h"

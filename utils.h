@@ -4,11 +4,27 @@
 
 #include "common.h"
 
+namespace ANBU
+{
+	void LOGGER(FILE *file_to_dump, const char *format, ...);
+	void LOGGER(const char *format, ...);
+	void LOGGER_INFO(FILE *file_to_dump, const char *format, ...);
+	void LOGGER_INFO(const char *format, ...);
+	void LOGGER_ERROR(FILE *file_to_dump, const char *format, ...);
+	void LOGGER_ERROR(const char *format, ...);
+
+	void LOGGER(FILE *file_to_dump, const wchar_t *format, ...);
+	void LOGGER(const wchar_t *format, ...);
+	void LOGGER_INFO(FILE *file_to_dump, const wchar_t *format, ...);
+	void LOGGER_INFO(const wchar_t *format, ...);
+	void LOGGER_ERROR(FILE *file_to_dump, const wchar_t *format, ...);
+	void LOGGER_ERROR(const wchar_t *format, ...);
+}
+
 namespace LIEF 
 {
 	uint64_t align(uint64_t value, uint64_t align_on);
-
-
+	
 	template<typename T>
 	inline constexpr T round(T x) {
 		return static_cast<T>(round<uint64_t>(x));

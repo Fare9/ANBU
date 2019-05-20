@@ -8,6 +8,7 @@
 #define RUN_PE_DETECTOR_H
 
 #include "common.h"
+#include "utils.h"
 #include "binary.h"
 #include "data_directory_header.h"
 

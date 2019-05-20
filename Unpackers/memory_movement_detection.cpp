@@ -33,12 +33,10 @@ void fini()
 *   the process.
 */
 {
-	fprintf(stderr, "------ unpacking complete ------\n");
-	fprintf(logfile, "------ unpacking complete ------\n");
+	ANBU::LOGGER(logfile, "------ unpacking complete ------\n");
 
 	// save final log and close file
-	fprintf(stderr, "------ end log ------\n");
-	fprintf(logfile, "------ end log ------\n");
+	ANBU::LOGGER(logfile, "------ end log ------\n");
 	fclose(logfile);
 }
 
@@ -163,12 +161,7 @@ void log_memwrite(UINT32 size)
 					dll_imports.at(i)->functions.at(j).function_destination = addr;
 					PIN_UnlockClient();
 
-					fprintf(stderr, "[INFO] API %s (0x%x) written to: 0x%x\n",
-						dll_imports.at(i)->functions.at(j).function_name.c_str(),
-						dll_imports.at(i)->functions.at(j).function_address,
-						dll_imports.at(i)->functions.at(j).function_destination);
-
-					fprintf(logfile, "[INFO] API %s (0x%x) written to: 0x%x\n",
+					ANBU::LOGGER_INFO(logfile, "API %s (0x%x) written to: 0x%x\n",
 						dll_imports.at(i)->functions.at(j).function_name.c_str(),
 						dll_imports.at(i)->functions.at(j).function_address,
 						dll_imports.at(i)->functions.at(j).function_destination);
@@ -218,8 +211,7 @@ void check_indirect_ctransfer(ADDRINT ip, ADDRINT target, BOOL taken)
 	*/
 	if (w_xor_x_heuristic.is_shadow_memory_writable(target) && !w_xor_x_heuristic.in_cluster(target))
 	{
-		fprintf(stderr, "[INFO] Jumped to the address: 0x%x, written before\n", target);
-		fprintf(logfile, "[INFO] Jumped to the address: 0x%x, written before\n", target);
+		ANBU::LOGGER_INFO(logfile, "Jumped to the address: 0x%x, written before\n", target);
 
 		w_xor_x_heuristic.set_cluster(target, true);
 		
@@ -262,19 +254,17 @@ bool dump_to_file(ADDRINT target)
 		// check if the dll to insert is inside of the unpacked zone
 		// if not, go fuck off
 		if (dll_imports.at(i)->dll_nameA.size() != 0)
-		 {
-			 fprintf(stderr, "[INFO] Adding to the import DLL: %s\n", dll_imports.at(i)->dll_nameA.c_str());
-			 fprintf(logfile, "[INFO] Adding to the import DLL: %s\n", dll_imports.at(i)->dll_nameA.c_str());
-			 library = pe_file->add_library(dll_imports.at(i)->dll_nameA.c_str());
-		 }
+		{
+			ANBU::LOGGER_INFO(logfile, "Adding to the import DLL: %s\n", dll_imports.at(i)->dll_nameA.c_str());
+			library = pe_file->add_library(dll_imports.at(i)->dll_nameA.c_str());
+		}
 		else
-		 {
-			 fwprintf(stderr, L"[INFO] Adding to the import DLL: %S\n", dll_imports.at(i)->dll_nameW.c_str());
-			 fwprintf(logfile, L"[INFO] Adding to the import DLL: %s\n", dll_imports.at(i)->dll_nameW.c_str());
-			 char* dll_nameA = (char*)calloc(1, wcslen(dll_imports.at(i)->dll_nameW.c_str()) + 1);
-			 wcstombs(dll_nameA, dll_imports.at(i)->dll_nameW.c_str(), wcslen(dll_imports.at(i)->dll_nameW.c_str()) + 1);
-			 library = pe_file->add_library(dll_nameA);
-		 }
+		{
+			ANBU::LOGGER_INFO(logfile, L"Adding to the import DLL: %S\n", dll_imports.at(i)->dll_nameW.c_str());
+			char* dll_nameA = (char*)calloc(1, wcslen(dll_imports.at(i)->dll_nameW.c_str()) + 1);
+			wcstombs(dll_nameA, dll_imports.at(i)->dll_nameW.c_str(), wcslen(dll_imports.at(i)->dll_nameW.c_str()) + 1);
+			library = pe_file->add_library(dll_nameA);
+		}
 		ADDRINT first_thunk = 0;
 
 		for (size_t j = 0; j < dll_imports.at(i)->functions.size(); j++)
@@ -287,9 +277,7 @@ bool dump_to_file(ADDRINT target)
 				if (dll_imports.at(i)->functions.at(j).function_ordinal > 0xFFFF)
 					continue;
 
-				fprintf(stderr, "[INFO] Adding to the import Function: 0%x\n", dll_imports.at(i)->functions.at(j).function_ordinal);
-				fprintf(logfile, "[INFO] Adding to the import Function: 0%x\n", dll_imports.at(i)->functions.at(j).function_ordinal);
-
+				ANBU::LOGGER_INFO(logfile, "Adding to the import Function: 0%x\n", dll_imports.at(i)->functions.at(j).function_ordinal);
 				const uint64_t ORDINAL_MASK = pe_file->type() == PE_TYPE::pe32_k ? 0x80000000 : 0x8000000000000000;
 				function = &library->add_entry(import_entry_t( ORDINAL_MASK | dll_imports.at(i)->functions.at(j).function_ordinal,"" ));
 			}
@@ -298,9 +286,7 @@ bool dump_to_file(ADDRINT target)
 				if (dll_imports.at(i)->functions.at(j).function_name.size() == 0 || dll_imports.at(i)->functions.at(j).function_name.size() > 256)
 					continue;
 
-				fprintf(stderr, "[INFO] Adding to the import Function: %s\n", dll_imports.at(i)->functions.at(j).function_name.c_str());
-				fprintf(logfile, "[INFO] Adding to the import Function: %s\n", dll_imports.at(i)->functions.at(j).function_name.c_str());
-
+				ANBU::LOGGER_INFO(logfile, "Adding to the import Function: %s\n", dll_imports.at(i)->functions.at(j).function_name.c_str());
 				function = &library->add_entry(dll_imports.at(i)->functions.at(j).function_name);
 			}
 			 
@@ -316,9 +302,7 @@ bool dump_to_file(ADDRINT target)
 		library->import_address_table_rva(first_thunk);
 	}
 
-
-	fprintf(stderr, "[INFO] Dumping to file\n");
-	fprintf(logfile, "[INFO] Dumping to file\n");
+	ANBU::LOGGER_INFO(logfile, "Dumping to file\n");
 	 
 	char file_name[MAX_PATH];
 	if (unpacked_file_name.size() != 0)
@@ -328,8 +312,7 @@ bool dump_to_file(ADDRINT target)
 
 	if (!pe_file->write(file_name, target))
 	{
-		fprintf(stderr, "[ERROR] Error dumping the file\n");
-		fprintf(logfile, "[ERROR] Error dumping the file\n");
+		ANBU::LOGGER_ERROR(logfile, "Error dumping the file\n");
 
 		return false;
 	}

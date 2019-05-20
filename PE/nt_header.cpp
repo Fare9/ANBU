@@ -170,16 +170,15 @@ namespace pe_parser
 	{
 		if (!pe_header_correct)
 			return false;
-
-		fprintf(file_to_dump, "================== DUMP NT HEADER ===================\n");
-		fprintf(file_to_dump, "\t+Signature: 0x%x\n",				signature_);
-		fprintf(file_to_dump, "\t+Machine: 0x%x\n",					machine_);
-		fprintf(file_to_dump, "\t+Number Of Sections: 0x%x\n",		numberOfSections_);
-		fprintf(file_to_dump, "\t+TimeDateStamp: 0x%x\n",			timeDateStamp_);
-		fprintf(file_to_dump, "\t+Pointer to Symbol Table: 0x%x\n",	pointerToSymbolTable_);
-		fprintf(file_to_dump, "\t+Number of symbols: 0x%x\n",		numberOfSymbols_);
-		fprintf(file_to_dump, "\t+Size of optional header: 0x%x\n",	sizeOfOptionalHeader_);
-		fprintf(file_to_dump, "\t+Characteristics: 0x%x\n",			characteristics_);
+		ANBU::LOGGER(file_to_dump, "================== DUMP NT HEADER ===================\n");
+		ANBU::LOGGER(file_to_dump, "\t+Signature: 0x%x\n", signature_);
+		ANBU::LOGGER(file_to_dump, "\t+Machine: 0x%x\n", machine_);
+		ANBU::LOGGER(file_to_dump, "\t+Number Of Sections: 0x%x\n", numberOfSections_);
+		ANBU::LOGGER(file_to_dump, "\t+TimeDateStamp: 0x%x\n", timeDateStamp_);
+		ANBU::LOGGER(file_to_dump, "\t+Pointer to Symbol Table: 0x%x\n", pointerToSymbolTable_);
+		ANBU::LOGGER(file_to_dump, "\t+Number of symbols: 0x%x\n", numberOfSymbols_);
+		ANBU::LOGGER(file_to_dump, "\t+Size of optional header: 0x%x\n", sizeOfOptionalHeader_);
+		ANBU::LOGGER(file_to_dump, "\t+Characteristics: 0x%x\n", characteristics_);
 
 		return true;
 	}

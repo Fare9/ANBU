@@ -4,6 +4,7 @@
 #define ANTI_METHODS_H
 
 #include "common.h"
+#include "utils.h"
 
 /******************************
 *	INSTRUMENTATION CODE

@@ -37,6 +37,7 @@ namespace pe_parser
 		is_64_bit(false)
 	{}
 
+
 	optional_header_t::optional_header_t(const pe64_optional_header *header) :
 		magic_(static_cast<PE_TYPE>(header->Magic)),
 		majorLinkerVersion_(header->MajorLinkerVersion),
@@ -70,6 +71,7 @@ namespace pe_parser
 		numberOfRvaAndSize_(header->NumberOfRvaAndSize),
 		is_64_bit(true)
 	{}
+
 
 	bool optional_header_t::is_64_bit_binary()
 	{
@@ -396,10 +398,12 @@ namespace pe_parser
 		return this->numberOfRvaAndSize_;
 	}
 
+
 	bool optional_header_t::has(DLL_CHARACTERISTICS c) const 
 	{
 		return (static_cast<uint32_t>(this->dll_characteristics()) & static_cast<uint32_t>(c)) > 0;
 	}
+
 
 	/********** SETTERS ************/
 	void optional_header_t::magic(PE_TYPE magic) 
@@ -599,6 +603,7 @@ namespace pe_parser
 		this->dll_characteristics(static_cast<DLL_CHARACTERISTICS>(static_cast<uint32_t>(this->dll_characteristics()) & (~static_cast<uint32_t>(c))));
 	}
 
+
 	size_t optional_header_t::get_optional_header_size()
 	{
 		if (this->is_64_bit_binary())
@@ -607,76 +612,77 @@ namespace pe_parser
 			return sizeof(pe32_optional_header);
 	}
 
+
 	bool optional_header_t::dump_optional_image(FILE *output_file)
 	{
 		if (!optional_header_correct)
 			return false;
 
-		fprintf(output_file, "================== DUMP OPTIONAL HEADER ===================\n");
+		ANBU::LOGGER(output_file, "================== DUMP OPTIONAL HEADER ===================\n");
 		if (is_64_bit)
 		{
-			fprintf(output_file, "\t+Magic: 0x%x\n", magic_);
-			fprintf(output_file, "\t+MajorLinkerVersion: 0x%x\n", majorLinkerVersion_);
-			fprintf(output_file, "\t+MenorLinkerVersion: 0x%x\n", minorLinkerVersion_);
-			fprintf(output_file, "\t+SizeOfCode: 0x%x\n", sizeOfCode_);
-			fprintf(output_file, "\t+SizeOfInitializedData: 0x%x\n", sizeOfInitializedData_);
-			fprintf(output_file, "\t+SizeOfUnItializedData: 0x%x\n", sizeOfUninitializedData_);
-			fprintf(output_file, "\t+AddressOfEntryPoint: 0x%x\n", addressOfEntryPoint_);
-			fprintf(output_file, "\t+BaseOfCode: 0x%x\n", baseOfCode_);
-			fprintf(output_file, "\t+ImageBase: 0x%llu\n", imageBase_);
-			fprintf(output_file, "\t+SectionAlignment: 0x%x\n", sectionAlignment_);
-			fprintf(output_file, "\t+FileAlignment: 0x%x\n", fileAlignment_);
-			fprintf(output_file, "\t+MajorOperatingSystemVersion: 0x%x\n", majorOperatingSystemVersion_);
-			fprintf(output_file, "\t+MinorOperatingSystemVersion: 0x%x\n", minorOperatingSystemVersion_);
-			fprintf(output_file, "\t+MajorImageVersion: 0x%x\n", majorImageVersion_);
-			fprintf(output_file, "\t+MinorImageVersion: 0x%x\n", minorImageVersion_);
-			fprintf(output_file, "\t+MajorSubsystemVersion: 0x%x\n", majorSubsystemVersion_);
-			fprintf(output_file, "\t+MinorSubsystemVersion: 0x%x\n", minorSubsystemVersion_);
-			fprintf(output_file, "\t+Win32VersionValue: 0x%x\n", win32VersionValue_);
-			fprintf(output_file, "\t+SizeOfImage: 0x%x\n", sizeOfImage_);
-			fprintf(output_file, "\t+SizeOfHeaders: 0x%x\n", sizeOfHeaders_);
-			fprintf(output_file, "\t+Checksum: 0x%x\n", checkSum_);
-			fprintf(output_file, "\t+Subsystem: 0x%x\n", static_cast<uint16_t>(subsystem_));
-			fprintf(output_file, "\t+DllCharacteristics: 0x%x\n", static_cast<uint16_t>(DLLCharacteristics_));
-			fprintf(output_file, "\t+SizeOfStackReserve: 0x%llu\n", sizeOfStackReserve_);
-			fprintf(output_file, "\t+SizeOfStackCommit: 0x%llu\n", sizeOfStackCommit_);
-			fprintf(output_file, "\t+SizeOfHeapReserve: 0x%llu\n", sizeOfHeapReserve_);
-			fprintf(output_file, "\t+SizeOfHeapCommit: 0x%llu\n", sizeOfHeapCommit_);
-			fprintf(output_file, "\t+LoaderFlags: 0x%x\n", loaderFlags_);
-			fprintf(output_file, "\t+NumberOfRvaAndSizes: 0x%x\n", numberOfRvaAndSize_);
+			ANBU::LOGGER(output_file, "\t+Magic: 0x%x\n", magic_);
+			ANBU::LOGGER(output_file, "\t+MajorLinkerVersion: 0x%x\n", majorLinkerVersion_);
+			ANBU::LOGGER(output_file, "\t+MenorLinkerVersion: 0x%x\n", minorLinkerVersion_);
+			ANBU::LOGGER(output_file, "\t+SizeOfCode: 0x%x\n", sizeOfCode_);
+			ANBU::LOGGER(output_file, "\t+SizeOfInitializedData: 0x%x\n", sizeOfInitializedData_);
+			ANBU::LOGGER(output_file, "\t+SizeOfUnItializedData: 0x%x\n", sizeOfUninitializedData_);
+			ANBU::LOGGER(output_file, "\t+AddressOfEntryPoint: 0x%x\n", addressOfEntryPoint_);
+			ANBU::LOGGER(output_file, "\t+BaseOfCode: 0x%x\n", baseOfCode_);
+			ANBU::LOGGER(output_file, "\t+ImageBase: 0x%llu\n", imageBase_);
+			ANBU::LOGGER(output_file, "\t+SectionAlignment: 0x%x\n", sectionAlignment_);
+			ANBU::LOGGER(output_file, "\t+FileAlignment: 0x%x\n", fileAlignment_);
+			ANBU::LOGGER(output_file, "\t+MajorOperatingSystemVersion: 0x%x\n", majorOperatingSystemVersion_);
+			ANBU::LOGGER(output_file, "\t+MinorOperatingSystemVersion: 0x%x\n", minorOperatingSystemVersion_);
+			ANBU::LOGGER(output_file, "\t+MajorImageVersion: 0x%x\n", majorImageVersion_);
+			ANBU::LOGGER(output_file, "\t+MinorImageVersion: 0x%x\n", minorImageVersion_);
+			ANBU::LOGGER(output_file, "\t+MajorSubsystemVersion: 0x%x\n", majorSubsystemVersion_);
+			ANBU::LOGGER(output_file, "\t+MinorSubsystemVersion: 0x%x\n", minorSubsystemVersion_);
+			ANBU::LOGGER(output_file, "\t+Win32VersionValue: 0x%x\n", win32VersionValue_);
+			ANBU::LOGGER(output_file, "\t+SizeOfImage: 0x%x\n", sizeOfImage_);
+			ANBU::LOGGER(output_file, "\t+SizeOfHeaders: 0x%x\n", sizeOfHeaders_);
+			ANBU::LOGGER(output_file, "\t+Checksum: 0x%x\n", checkSum_);
+			ANBU::LOGGER(output_file, "\t+Subsystem: 0x%x\n", static_cast<uint16_t>(subsystem_));
+			ANBU::LOGGER(output_file, "\t+DllCharacteristics: 0x%x\n", static_cast<uint16_t>(DLLCharacteristics_));
+			ANBU::LOGGER(output_file, "\t+SizeOfStackReserve: 0x%llu\n", sizeOfStackReserve_);
+			ANBU::LOGGER(output_file, "\t+SizeOfStackCommit: 0x%llu\n", sizeOfStackCommit_);
+			ANBU::LOGGER(output_file, "\t+SizeOfHeapReserve: 0x%llu\n", sizeOfHeapReserve_);
+			ANBU::LOGGER(output_file, "\t+SizeOfHeapCommit: 0x%llu\n", sizeOfHeapCommit_);
+			ANBU::LOGGER(output_file, "\t+LoaderFlags: 0x%x\n", loaderFlags_);
+			ANBU::LOGGER(output_file, "\t+NumberOfRvaAndSizes: 0x%x\n", numberOfRvaAndSize_);
 		}
 		else
 		{
-			fprintf(output_file, "\t+Magic: 0x%x\n", magic_);
-			fprintf(output_file, "\t+MajorLinkerVersion: 0x%x\n", majorLinkerVersion_);
-			fprintf(output_file, "\t+MenorLinkerVersion: 0x%x\n", minorLinkerVersion_);
-			fprintf(output_file, "\t+SizeOfCode: 0x%x\n", sizeOfCode_);
-			fprintf(output_file, "\t+SizeOfInitializedData: 0x%x\n", sizeOfInitializedData_);
-			fprintf(output_file, "\t+SizeOfUnItializedData: 0x%x\n", sizeOfUninitializedData_);
-			fprintf(output_file, "\t+AddressOfEntryPoint: 0x%x\n", addressOfEntryPoint_);
-			fprintf(output_file, "\t+BaseOfCode: 0x%x\n", baseOfCode_);
-			fprintf(output_file, "\t+BaseOfData: 0x%x\n", baseOfData_);
-			fprintf(output_file, "\t+ImageBase: 0x%llu\n", imageBase_);
-			fprintf(output_file, "\t+SectionAlignment: 0x%x\n", sectionAlignment_);
-			fprintf(output_file, "\t+FileAlignment: 0x%x\n", fileAlignment_);
-			fprintf(output_file, "\t+MajorOperatingSystemVersion: 0x%x\n", majorOperatingSystemVersion_);
-			fprintf(output_file, "\t+MinorOperatingSystemVersion: 0x%x\n", minorOperatingSystemVersion_);
-			fprintf(output_file, "\t+MajorImageVersion: 0x%x\n", majorImageVersion_);
-			fprintf(output_file, "\t+MinorImageVersion: 0x%x\n", minorImageVersion_);
-			fprintf(output_file, "\t+MajorSubsystemVersion: 0x%x\n", majorSubsystemVersion_);
-			fprintf(output_file, "\t+MinorSubsystemVersion: 0x%x\n", minorSubsystemVersion_);
-			fprintf(output_file, "\t+Win32VersionValue: 0x%x\n", win32VersionValue_);
-			fprintf(output_file, "\t+SizeOfImage: 0x%x\n", sizeOfImage_);
-			fprintf(output_file, "\t+SizeOfHeaders: 0x%x\n", sizeOfHeaders_);
-			fprintf(output_file, "\t+Checksum: 0x%x\n", checkSum_);
-			fprintf(output_file, "\t+Subsystem: 0x%x\n", static_cast<uint16_t>(subsystem_));
-			fprintf(output_file, "\t+DllCharacteristics: 0x%x\n", static_cast<uint16_t>(DLLCharacteristics_));
-			fprintf(output_file, "\t+SizeOfStackReserve: 0x%llu\n", sizeOfStackReserve_);
-			fprintf(output_file, "\t+SizeOfStackCommit: 0x%llu\n", sizeOfStackCommit_);
-			fprintf(output_file, "\t+SizeOfHeapReserve: 0x%llu\n", sizeOfHeapReserve_);
-			fprintf(output_file, "\t+SizeOfHeapCommit: 0x%llu\n", sizeOfHeapCommit_);
-			fprintf(output_file, "\t+LoaderFlags: 0x%x\n", loaderFlags_);
-			fprintf(output_file, "\t+NumberOfRvaAndSizes: 0x%x\n", numberOfRvaAndSize_);
+			ANBU::LOGGER(output_file, "\t+Magic: 0x%x\n", magic_);
+			ANBU::LOGGER(output_file, "\t+MajorLinkerVersion: 0x%x\n", majorLinkerVersion_);
+			ANBU::LOGGER(output_file, "\t+MenorLinkerVersion: 0x%x\n", minorLinkerVersion_);
+			ANBU::LOGGER(output_file, "\t+SizeOfCode: 0x%x\n", sizeOfCode_);
+			ANBU::LOGGER(output_file, "\t+SizeOfInitializedData: 0x%x\n", sizeOfInitializedData_);
+			ANBU::LOGGER(output_file, "\t+SizeOfUnItializedData: 0x%x\n", sizeOfUninitializedData_);
+			ANBU::LOGGER(output_file, "\t+AddressOfEntryPoint: 0x%x\n", addressOfEntryPoint_);
+			ANBU::LOGGER(output_file, "\t+BaseOfCode: 0x%x\n", baseOfCode_);
+			ANBU::LOGGER(output_file, "\t+BaseOfData: 0x%x\n", baseOfData_);
+			ANBU::LOGGER(output_file, "\t+ImageBase: 0x%llu\n", imageBase_);
+			ANBU::LOGGER(output_file, "\t+SectionAlignment: 0x%x\n", sectionAlignment_);
+			ANBU::LOGGER(output_file, "\t+FileAlignment: 0x%x\n", fileAlignment_);
+			ANBU::LOGGER(output_file, "\t+MajorOperatingSystemVersion: 0x%x\n", majorOperatingSystemVersion_);
+			ANBU::LOGGER(output_file, "\t+MinorOperatingSystemVersion: 0x%x\n", minorOperatingSystemVersion_);
+			ANBU::LOGGER(output_file, "\t+MajorImageVersion: 0x%x\n", majorImageVersion_);
+			ANBU::LOGGER(output_file, "\t+MinorImageVersion: 0x%x\n", minorImageVersion_);
+			ANBU::LOGGER(output_file, "\t+MajorSubsystemVersion: 0x%x\n", majorSubsystemVersion_);
+			ANBU::LOGGER(output_file, "\t+MinorSubsystemVersion: 0x%x\n", minorSubsystemVersion_);
+			ANBU::LOGGER(output_file, "\t+Win32VersionValue: 0x%x\n", win32VersionValue_);
+			ANBU::LOGGER(output_file, "\t+SizeOfImage: 0x%x\n", sizeOfImage_);
+			ANBU::LOGGER(output_file, "\t+SizeOfHeaders: 0x%x\n", sizeOfHeaders_);
+			ANBU::LOGGER(output_file, "\t+Checksum: 0x%x\n", checkSum_);
+			ANBU::LOGGER(output_file, "\t+Subsystem: 0x%x\n", static_cast<uint16_t>(subsystem_));
+			ANBU::LOGGER(output_file, "\t+DllCharacteristics: 0x%x\n", static_cast<uint16_t>(DLLCharacteristics_));
+			ANBU::LOGGER(output_file, "\t+SizeOfStackReserve: 0x%llu\n", sizeOfStackReserve_);
+			ANBU::LOGGER(output_file, "\t+SizeOfStackCommit: 0x%llu\n", sizeOfStackCommit_);
+			ANBU::LOGGER(output_file, "\t+SizeOfHeapReserve: 0x%llu\n", sizeOfHeapReserve_);
+			ANBU::LOGGER(output_file, "\t+SizeOfHeapCommit: 0x%llu\n", sizeOfHeapCommit_);
+			ANBU::LOGGER(output_file, "\t+LoaderFlags: 0x%x\n", loaderFlags_);
+			ANBU::LOGGER(output_file, "\t+NumberOfRvaAndSizes: 0x%x\n", numberOfRvaAndSize_);
 		}
 
 		return true;

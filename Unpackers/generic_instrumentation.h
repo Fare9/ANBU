@@ -4,6 +4,7 @@
 #define GENERIC_INSTRUMENTATION_H
 
 #include "common.h"
+#include "utils.h"
 #include "binary.h"
 #include "anti-methods.h"
 

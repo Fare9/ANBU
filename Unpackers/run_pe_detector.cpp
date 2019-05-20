@@ -48,8 +48,7 @@ void enum_syscalls()
 	WINDOWS::PWORD address_of_name_ordinals		=	(WINDOWS::PWORD)((WINDOWS::LONG)dos_header + export_directory->AddressOfNameOrdinals);
 	size_t  number_of_names						=	MIN(export_directory->NumberOfFunctions, export_directory->NumberOfNames);
 
-	fprintf(stderr, "<------------------- Getting syscalls ------------------->\n");
-	fprintf(logfile, "<------------------- Getting syscalls ------------------->\n");
+	ANBU::LOGGER(logfile, "<------------------- Getting syscalls ------------------->\n");
 	for (size_t i = 0; i < number_of_names; i++)
 	{
 		const char		*name = (const char *)((WINDOWS::LONG)dos_header + address_of_names[i]);
@@ -70,15 +69,12 @@ void enum_syscalls()
 			{
 				// get syscall number from code
 				unsigned long syscall_number = *(WINDOWS::PDWORD)(addr + 1);
-				fprintf(stderr, "[INFO] Saved syscall 0x%x(%s)\n", syscall_number, name);
-				fprintf(logfile, "[INFO] Saved syscall 0x%x(%s)\n", syscall_number, name);
+				ANBU::LOGGER_INFO(logfile, "Saved syscall 0x%x(%s)\n", syscall_number, name);
 				g_syscall_names[syscall_number] = name;
 			}
 		}
 	}
-
-	fprintf(stderr, "<-------------------------------------->\n");
-	fprintf(logfile, "<-------------------------------------->\n");
+	ANBU::LOGGER(logfile, "<-------------------------------------->\n");
 }
 
 unsigned long syscall_name_to_number(const char *name)
@@ -90,7 +86,7 @@ unsigned long syscall_name_to_number(const char *name)
 			!strcmp(g_syscall_names[i] + 2, name + 2))
 			return i;
 	}
-	fprintf(stderr, "[ERROR] The syscall %s was not found\n", name);
+	ANBU::LOGGER_ERROR("The syscall %s was not found\n", name);
 	return 0;
 }
 
@@ -128,7 +124,6 @@ void syscall_get_arguments(CONTEXT *ctx, SYSCALL_STANDARD std, int count, ...)
 	}
 
 	va_end(args);
-
 }
 
 void syscall_entry(THREADID thread_id, CONTEXT *ctx, SYSCALL_STANDARD std, void *v)
@@ -154,56 +149,41 @@ void syscall_entry(THREADID thread_id, CONTEXT *ctx, SYSCALL_STANDARD std, void 
 
 		if (syscall_number == SYS_NtCreateUserProcess)
 		{
-			fprintf(stderr, "[INFO] Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
-			fprintf(logfile, "[INFO] Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
+			ANBU::LOGGER_INFO(logfile, "Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
 
 			ULONG create_thread_flags;
 
 			syscall_get_arguments(ctx, std, 4, 0, &sc->arg0, 1, &sc->arg1, 8, &process_parameters, 7, &create_thread_flags);
-		
-			fwprintf(stderr, L"[INFO] image_name: %S\ncommand_line: %S\n",
+			
+			ANBU::LOGGER_INFO(logfile, "Image_name: %S\ncommand_line: %S\n",
 				process_parameters->ImagePathName.Buffer,
 				process_parameters->CommandLine.Buffer);
-
-			fwprintf(logfile, L"[INFO] image_name: %S\ncommand_line: %S\n",
-				process_parameters->ImagePathName.Buffer,
-				process_parameters->CommandLine.Buffer);
-
-			fprintf(stderr, "[INFO] process_flags: 0x%x\nthread_flags: 0x%x\n",
+			ANBU::LOGGER_INFO(logfile, "Process_flags: 0x%x\nthread_flags: 0x%x\n",
 				PIN_GetSyscallArgument(ctx, std, 6),
 				PIN_GetSyscallArgument(ctx, std, 7));
-
-			fprintf(logfile, "[INFO] process_flags: 0x%x\nthread_flags: 0x%x\n",
-				PIN_GetSyscallArgument(ctx, std, 6),
-				PIN_GetSyscallArgument(ctx, std, 7));
-
 		}
 		else if (syscall_number == SYS_NtCreateProcess ||
 			syscall_number == SYS_NtCreateProcessEx)
 		{
-			fprintf(stderr, "[INFO] Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
-			fprintf(logfile, "[INFO] Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
+			ANBU::LOGGER_INFO(logfile, "Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
 			syscall_get_arguments(ctx, std, 2, 0, &sc->arg0, 2, &object_attributes);
 			
 			if (object_attributes != NULL &&
 				object_attributes->ObjectName != NULL)
 			{
-				fwprintf(stderr, L"[INFO] process executed image_name: %S\n", object_attributes->ObjectName->Buffer);
-				fwprintf(logfile, L"[INFO] process execute image_name: %S\n", object_attributes->ObjectName->Buffer);
+				ANBU::LOGGER_INFO(logfile, L"Process execute image_name: %S\n", object_attributes->ObjectName->Buffer);
 			}
 		}
 		else if (syscall_number == SYS_NtWriteVirtualMemory)
 		{
-			fprintf(stderr, "[INFO] Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
-			fprintf(logfile, "[INFO] Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
+			ANBU::LOGGER_INFO(logfile, "Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
 
 			HANDLE process_handle;
 			char *base_address, *buffer;
 
 			syscall_get_arguments(ctx, std, 5, 0, &process_handle, 1, &base_address, 2, &buffer, 3, &sc->arg3, 4, &sc->arg4);
 
-			fprintf(stderr, "[INFO] Process Handle: 0x%x\nBase Address to write: 0x%x\nBuffer with data to write: 0x%x\nSize: 0x%x\n", (unsigned int)process_handle, (unsigned int)base_address, (unsigned int)buffer, (unsigned int)sc->arg3);
-			fprintf(logfile, "[INFO] Process Handle: 0x%x\nBase Address to write: 0x%x\nBuffer with data to write: 0x%x\nSize: 0x%x\n", (unsigned int)process_handle, (unsigned int)base_address, (unsigned int)buffer, (unsigned int)sc->arg3);
+			ANBU::LOGGER_INFO(logfile, "Process Handle: 0x%x\nBase Address to write: 0x%x\nBuffer with data to write: 0x%x\nSize: 0x%x\n", (unsigned int)process_handle, (unsigned int)base_address, (unsigned int)buffer, (unsigned int)sc->arg3);
 			
 			write_mem = new write_memory_t();
 
@@ -214,8 +194,7 @@ void syscall_entry(THREADID thread_id, CONTEXT *ctx, SYSCALL_STANDARD std, void 
 
 			if (PIN_SafeCopy(write_mem->data.begin(), (const VOID*)buffer, (size_t)sc->arg3) != (size_t)sc->arg3)
 			{
-				fprintf(stderr, "[ERROR] not possible to read from 0x%x\n", (unsigned int)buffer);
-				fprintf(logfile,"[ERROR] not possible to read from 0x%x\n", (unsigned int)buffer);
+				ANBU::LOGGER_ERROR(logfile, "Not possible to read from 0x%x\n", (unsigned int)buffer);
 
 				PIN_ExitProcess(-1);
 				exit(-1);
@@ -224,19 +203,16 @@ void syscall_entry(THREADID thread_id, CONTEXT *ctx, SYSCALL_STANDARD std, void 
 		}
 		else if (syscall_number == SYS_NtResumeThread)
 		{
-			fprintf(stderr, "[INFO] Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
-			fprintf(logfile, "[INFO] Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
+			ANBU::LOGGER_INFO(logfile, "Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
 
 			WINDOWS::TerminateThread(g_thread_handle[0], 0);
 			WINDOWS::TerminateProcess(g_process_handle[0], 0);
 
-			fprintf(stderr, "[INFO] Finished runPE process... Dumping\n");
-			fprintf(logfile, "[INFO] Finished runPE process... Dumping\n");
+			ANBU::LOGGER_INFO(logfile, "Finished runPE process... Dumping\n");
 
 			for (it = process_data.begin(); it != process_data.end(); it++)
 			{
-				fprintf(stderr, "[INFO] Dumping file for process handle: 0x%x\n", (unsigned int)it->first);
-				fprintf(logfile, "[INFO] Dumping file for process handle: 0x%x\n", (unsigned int)it->first);
+				ANBU::LOGGER_INFO(logfile, "Dumping file for process handle: 0x%x\n", (unsigned int)it->first);
 				
 				for (size_t index_vector = 0; index_vector < it->second.size(); index_vector++)
 				{
@@ -256,8 +232,7 @@ void syscall_entry(THREADID thread_id, CONTEXT *ctx, SYSCALL_STANDARD std, void 
 				if (index_base_address == -1)
 				{
 					PIN_UnlockClient();
-					fprintf(stderr, "[ERROR] not found base memory in process with handle: 0x%x\n", (unsigned int)it->first);
-					fprintf(logfile, "[ERROR] not found base memory in process with handle: 0x%x\n", (unsigned int)it->first);
+					ANBU::LOGGER_ERROR(logfile, "Not found base memory in process with handle: 0x%x\n", (unsigned int)it->first);
 
 					delete binary_;
 					continue;
@@ -271,13 +246,11 @@ void syscall_entry(THREADID thread_id, CONTEXT *ctx, SYSCALL_STANDARD std, void 
 
 				if(!binary_->write(file_name, it->second.at(index_base_address).data, it->second))
 				{
-					fprintf(stderr, "[ERROR] not possible to dump process with handle: 0x%x\n", (unsigned int)it->first);
-					fprintf(logfile, "[ERROR] not possible to dump process with handle: 0x%x\n", (unsigned int)it->first);
+					ANBU::LOGGER_ERROR(logfile, "Not possible to dump process with handle: 0x%x\n", (unsigned int)it->first);
 				}
 				else
 				{
-					fprintf(stderr, "[INFO] Success dumping process with handle %x and base 0x%x", (unsigned int)it->first, (unsigned int)it->second.at(index_base_address).address);
-					fprintf(logfile, "[INFO] Success dumping process with handle %x and base 0x%x", (unsigned int)it->first, (unsigned int)it->second.at(index_base_address).address);
+					ANBU::LOGGER_INFO(logfile, "Success dumping process with handle %x and base 0x%x", (unsigned int)it->first, (unsigned int)it->second.at(index_base_address).address);
 				}
 
 				PIN_UnlockClient();
@@ -288,43 +261,38 @@ void syscall_entry(THREADID thread_id, CONTEXT *ctx, SYSCALL_STANDARD std, void 
 		}
 		else if (syscall_number == SYS_NtDuplicateObject)
 		{
-			fprintf(stderr, "[ERROR] DuplicateHandle() not implemented yet!\n");
+			ANBU::LOGGER_ERROR("DuplicateHandle() not implemented yet!\n");
 		}
 		else if (syscall_number == SYS_NtOpenThread)
 		{
-			fprintf(stderr, "[ERROR] OpenThread() not implemented yet!\n");
+			ANBU::LOGGER_ERROR("OpenThread() not implemented yet!\n");
 		}
 		else if (syscall_number == SYS_NtOpenProcess)
 		{
-			fprintf(stderr, "[ERROR] OpenProcess() not implemented yet!\n");
+			ANBU::LOGGER_ERROR("OpenProcess() not implemented yet!\n");
 		}
 		else if (syscall_number == SYS_NtDelayExecution)
 		{
-			fprintf(stderr, "[INFO] Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
-			fprintf(logfile, "[INFO] Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
+			ANBU::LOGGER_INFO(logfile, "Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
 			WINDOWS::LARGE_INTEGER *delay_interval;
 			syscall_get_arguments(ctx, std, 1, 1, &delay_interval);
 			if (delay_interval->QuadPart != 0)
 			{
-				fprintf(stderr, "[INFO] Skipped Sleep(%d)\n", (int)-delay_interval->QuadPart / 10000);
-				fprintf(logfile, "[INFO] Skipped Sleep(%d)\n", (int)-delay_interval->QuadPart / 10000);
+				ANBU::LOGGER_INFO(logfile, "Skipped Sleep(%d)\n", (int)-delay_interval->QuadPart / 10000);
 			}
 			delay_interval->QuadPart = 0; // modify!!!
 		}
 		else if (syscall_number == SYS_NtUnmapViewOfSection)
 		{
-			fprintf(stderr, "[INFO] Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
-			fprintf(logfile, "[INFO] Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
+			ANBU::LOGGER_INFO(logfile, "Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
 
 			syscall_get_arguments(ctx, std, 2, 0, &sc->arg0, 1, &sc->arg1);
-
-			fprintf(stderr, "[INFO] Unmaped section 0x%x in process handle %x\n", (unsigned int)sc->arg0, (unsigned int)sc->arg1);
-			fprintf(logfile, "[INFO] Unmaped section 0x%x in process handle %x\n", (unsigned int)sc->arg0, (unsigned int)sc->arg1);
+			
+			ANBU::LOGGER_INFO(logfile, "Unmaped section 0x%x in process handle %x\n", (unsigned int)sc->arg0, (unsigned int)sc->arg1);
 		}
 		else if (syscall_number == SYS_NtAllocateVirtualMemory)
 		{
-			fprintf(stderr, "[INFO] Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
-			fprintf(logfile, "[INFO] Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
+			ANBU::LOGGER_INFO(logfile, "Syscall called 0x%x(%s) thread 0x%x \n", syscall_number, name, thread_id);
 
 			ADDRINT address_to_allocate;
 			WINDOWS::SIZE_T  size_to_allocate;
@@ -333,10 +301,7 @@ void syscall_entry(THREADID thread_id, CONTEXT *ctx, SYSCALL_STANDARD std, void 
 			PIN_SafeCopy((VOID*)&address_to_allocate, (const VOID*)sc->arg1, sizeof(ADDRINT));
 			PIN_SafeCopy((VOID*)&size_to_allocate, (const VOID*)sc->arg2, sizeof(WINDOWS::SIZE_T));
 
-			fprintf(stderr, "[INFO] Allocated memory address 0x%x, with size 0x%x, in process handle %x\n", (unsigned int)address_to_allocate, 
-																											(unsigned int)size_to_allocate, 
-																											(unsigned int)sc->arg0);
-			fprintf(logfile, "[INFO] Allocated memory address 0x%x, with size 0x%x, in process handle %x\n", (unsigned int)address_to_allocate,
+			ANBU::LOGGER_INFO(logfile, "Allocated memory address 0x%x, with size 0x%x, in process handle %x\n", (unsigned int)address_to_allocate,
 				(unsigned int)size_to_allocate,
 				(unsigned int)sc->arg0);
 		}

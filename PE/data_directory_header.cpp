@@ -94,9 +94,9 @@ namespace pe_parser
 
 	bool data_directory_header_t::dump_directories(FILE *output_file)
 	{
-		fprintf(output_file, "\t+Name: %s\n",				directory_names[this->type()].c_str());
-		fprintf(output_file, "\t+Virtual Address: 0x%x\n",	this->RVA());
-		fprintf(output_file, "\t+Size: 0x%x\n",				this->size());
+		ANBU::LOGGER(output_file, "\t+Name: %s\n", directory_names[this->type()].c_str());
+		ANBU::LOGGER(output_file, "\t+Virtual Address: 0x%x\n", this->RVA());
+		ANBU::LOGGER(output_file, "\t+Size: 0x%x\n", this->size());
 
 		return true;
 	}

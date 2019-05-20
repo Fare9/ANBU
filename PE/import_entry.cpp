@@ -108,10 +108,10 @@ void import_entry_t::data(uint64_t data)
 
 bool import_entry_t::dump_import_entry(FILE *output_file)
 {
-	fprintf(output_file, "%s\n", this->name().c_str());
-	fprintf(output_file, "%llu\n", this->data());
-	fprintf(output_file, "%llu\n", this->iat_value());
-	fprintf(output_file, "%x\n", this->hint());
+	ANBU::LOGGER(output_file, "%s\n", this->name().c_str());
+	ANBU::LOGGER(output_file, "%llu\n", this->data());
+	ANBU::LOGGER(output_file, "%llu\n", this->iat_value());
+	ANBU::LOGGER(output_file, "%x\n", this->hint());
 
 	return true;
 }
