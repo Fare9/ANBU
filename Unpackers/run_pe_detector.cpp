@@ -19,7 +19,9 @@ ADDRINT										SYS_NtOpenProcess,
 											SYS_NtCreateProcess, 
 											SYS_NtCreateProcessEx;
 ADDRINT										SYS_NtAllocateVirtualMemory,
-											SYS_NtUnmapViewOfSection;
+											SYS_NtUnmapViewOfSection,
+											SYS_NtMapViewOfSection,
+											SYS_NtRequestWaitReplyPortHook;
 
 ADDRINT										entry_point;
 
@@ -77,6 +79,7 @@ void enum_syscalls()
 	ANBU::LOGGER(logfile, "<-------------------------------------->\n");
 }
 
+
 unsigned long syscall_name_to_number(const char *name)
 {
 	for (size_t i = 0; i < g_syscall_names.size(); i++)
@@ -89,6 +92,7 @@ unsigned long syscall_name_to_number(const char *name)
 	ANBU::LOGGER_ERROR("The syscall %s was not found\n", name);
 	return 0;
 }
+
 
 void init_common_syscalls()
 {
@@ -107,9 +111,12 @@ void init_common_syscalls()
 	SYS_NtAllocateVirtualMemory = syscall_name_to_number("NtAllocateVirtualMemory");
 	/****** Other functions *******/
 	SYS_NtUnmapViewOfSection	= syscall_name_to_number("NtUnmapViewOfSection");
+	SYS_NtMapViewOfSection		= syscall_name_to_number("NtMapViewOfSection");
+	SYS_NtRequestWaitReplyPortHook = syscall_name_to_number("NtRequestWaitReplyPortHook");
 	SYS_NtDuplicateObject		= syscall_name_to_number("NtDuplicateObject");
 	SYS_NtDelayExecution		= syscall_name_to_number("NtDelayExecution");
 }
+
 
 void syscall_get_arguments(CONTEXT *ctx, SYSCALL_STANDARD std, int count, ...)
 {
@@ -125,6 +132,7 @@ void syscall_get_arguments(CONTEXT *ctx, SYSCALL_STANDARD std, int count, ...)
 
 	va_end(args);
 }
+
 
 void syscall_entry(THREADID thread_id, CONTEXT *ctx, SYSCALL_STANDARD std, void *v)
 {
@@ -308,9 +316,12 @@ void syscall_entry(THREADID thread_id, CONTEXT *ctx, SYSCALL_STANDARD std, void 
 	}
 }
 
+
 void syscall_exit(THREADID thread_id, CONTEXT *ctx, SYSCALL_STANDARD std, void *v)
 {
 	syscall_t *sc = &((syscall_t*)v)[thread_id];
+	proc_info_t* proc_info = proc_info_t::get_instance();
+
 
 	if (sc->syscall_number == SYS_NtCreateUserProcess)
 	{
@@ -321,6 +332,58 @@ void syscall_exit(THREADID thread_id, CONTEXT *ctx, SYSCALL_STANDARD std, void *
 		sc->syscall_number == SYS_NtCreateProcessEx)
 	{
 		g_process_handle[g_process_handle_count++] = *(HANDLE*)sc->arg0;
+	}
+	else if (sc->syscall_number == SYS_NtAllocateVirtualMemory)
+	{
+		heap_zone_t hz;
+		WINDOWS::PVOID base_address_pointer = reinterpret_cast<WINDOWS::PVOID>(sc->arg1);
+		
+		if (base_address_pointer == nullptr)
+			return;
+		
+		WINDOWS::PSIZE_T region_size_address = reinterpret_cast<WINDOWS::PSIZE_T>(sc->arg2);
+
+		if (region_size_address == nullptr)
+			return;
+
+		ADDRINT heap_address = *(reinterpret_cast<ADDRINT*>(base_address_pointer));
+		WINDOWS::SIZE_T region_size = *(reinterpret_cast<WINDOWS::SIZE_T*>(region_size_address));
+
+		hz.begin = heap_address;
+		hz.size = region_size;
+		hz.end = region_size + heap_address;
+		hz.version = 0;
+
+		char heap_key_address[30];
+		char heap_key_size[30];
+
+		snprintf(heap_key_address, 30, "%x", heap_address);
+		snprintf(heap_key_size, 30, "%x", region_size);
+
+		std::string heap_key = heap_key_address;
+		heap_key += heap_key_size;
+
+		std::string hz_md5 = md5(heap_key);
+
+		ANBU::LOGGER_INFO("NtAllocateVirtualMemoryHook insert in Heap Zone %08x -> %08x MD5(begin_addr+end_addr): %s\n", hz.begin, hz.end, hz_md5.c_str());
+		proc_info->insert_heap_zone(hz_md5, hz);
+	}
+	else if (sc->syscall_number == SYS_NtMapViewOfSection)
+	{
+		WINDOWS::PVOID *pbase_address = reinterpret_cast<WINDOWS::PVOID*>(sc->arg2);
+
+		if (pbase_address == nullptr)
+			return;
+
+		ADDRINT base_address = *(reinterpret_cast<ADDRINT*>(pbase_address));
+
+		proc_info->add_mapped_files_address(base_address);
+	}
+	else if (sc->syscall_number == SYS_NtRequestWaitReplyPortHook)
+	{
+		//The NtRequestWaitReplyPortHook allocates 4 memory pages of type MEM_MAPPED so we need to rescan the memory after it has been performed
+		ANBU::LOGGER_INFO("Found a NtRequestWaitReplyPort\n");
+		proc_info->set_current_mapped_files();
 	}
 }
 

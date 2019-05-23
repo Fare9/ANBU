@@ -2,12 +2,13 @@
 *   Compile: make PIN_ROOT="<path_to_pin>"
 */
 #include "unpacker.h"
-#include "utils.h"
+
 
 
 FILE*				logfile; // log file handler
 binary_t*			pe_file;
 uint64_t			tick_counts_per_millisecond = 0; // more or less ticks per millisecond
+proc_info_t*		proc_info = proc_info_t::get_instance();
 std::string			unpacked_file_name;
 std::string			import_section_name;
  /*
@@ -158,6 +159,7 @@ int main(int argc, char *argv[])
 	IMG_AddInstrumentFunction(hook_functions, NULL);
 	INS_AddInstrumentFunction(hook_instructions, NULL);
 
+	proc_info->add_proc_addresses();
 	/*
 	*   RUN the program and never return
 	*/

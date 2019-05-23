@@ -11,7 +11,7 @@
 /************* EXTERN VARIABLES *************/
 extern FILE*						logfile; // log file handler
 extern binary_t*					pe_file;
-
+extern proc_info_t*					proc_info;
 /************* VARIABLES USED FOR MONITORING BINARY *************/
 ADDRINT								main_base_address;
 dll_import_struct_t*				aux = nullptr;
@@ -20,6 +20,7 @@ bool								check_first_thunk = false;
 
 const char*							saved_dll_nameA = nullptr;
 const wchar_t*						saved_dll_nameW = nullptr;
+
 
 
 void get_addresses_from_images(IMG img, VOID *v)
@@ -32,6 +33,10 @@ void get_addresses_from_images(IMG img, VOID *v)
 
 	ANBU::LOGGER_INFO(logfile, "IMG Loaded: %s\n", IMG_Name(img).c_str());
 
+	ADDRINT start_addr = IMG_LowAddress(img);
+	ADDRINT end_addr = IMG_HighAddress(img);
+	const std::string name = IMG_Name(img);
+
 	if (IMG_IsMainExecutable(img)) 
 	/*
 	*	Check if the loaded executable is the main one
@@ -42,7 +47,20 @@ void get_addresses_from_images(IMG img, VOID *v)
 		pe_file = new binary_t(main_base_address);
 		pe_file->analyze_binary();
 		ANBU::LOGGER_INFO(logfile, "Binary Base Address: 0x%x\n", main_base_address);
+
+		proc_info->process_not_being_debugged();
+		proc_info->print_peb_information();
+
+		proc_info->proc_name(name);
+		proc_info->main_img_address(start_addr, end_addr);
+		proc_info->first_instruction(IMG_Entry(img));
 		return;
+	}
+	else
+	{
+		// if it's not the main executable we add it as a library,
+		// and it will be categorized as known or unknown
+		proc_info->add_library(name, start_addr, end_addr);
 	}
 
 	loadlibraryA = RTN_FindByName(img, "LoadLibraryA");

@@ -10,6 +10,8 @@ namespace WINDOWS {
 #include <wchar.h>
 #include <Windows.h>
 #include <tlhelp32.h>
+#include "Winternl.h"
+#include "Intsafe.h"
 }
 
 #include <iostream>
@@ -21,6 +23,7 @@ namespace WINDOWS {
 #include <memory>
 #include <vector>
 #include <map>
+
 
 
 typedef struct _write_memory

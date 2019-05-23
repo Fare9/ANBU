@@ -120,6 +120,12 @@
     <ClInclude Include="PE\structures_and_enums.h">
       <Filter>Header Files\PE</Filter>
     </ClInclude>
+    <ClInclude Include="PE\proc_info.h">
+      <Filter>Header Files\PE</Filter>
+    </ClInclude>
+    <ClInclude Include="md5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="unpacker.cpp">
@@ -172,6 +178,12 @@
     </ClCompile>
     <ClCompile Include="PE\import.cpp">
       <Filter>Source Files\PE\fixer</Filter>
+    </ClCompile>
+    <ClCompile Include="PE\proc_info.cpp">
+      <Filter>Source Files\PE</Filter>
+    </ClCompile>
+    <ClCompile Include="md5.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

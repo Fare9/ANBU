@@ -5,6 +5,7 @@
 
 #include "common.h"
 #include "utils.h"
+#include "proc_info.h"
 #include "binary.h"
 #include "anti-methods.h"
 

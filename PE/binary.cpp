@@ -622,6 +622,9 @@ bool binary_t::has_section_changed_entropy(ADDRINT address_of_section)
 
 	pe_parser::section_header_t* section = this->section_from_rva(address_of_section - this->binary_base_address);
 
+	if (section == nullptr)
+		return false;
+
 	entropy = calculate_entropy_section(*section);
 
 	for (i = 0; i < this->section_table_header_.size(); i++)

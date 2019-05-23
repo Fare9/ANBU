@@ -19,6 +19,8 @@ namespace ANBU
 	void LOGGER_INFO(const wchar_t *format, ...);
 	void LOGGER_ERROR(FILE *file_to_dump, const wchar_t *format, ...);
 	void LOGGER_ERROR(const wchar_t *format, ...);
+
+	std::string replace_string(std::string str, const string& from, const string& to);
 }
 
 namespace LIEF 

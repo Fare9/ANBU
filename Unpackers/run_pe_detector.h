@@ -10,6 +10,8 @@
 #include "common.h"
 #include "utils.h"
 #include "binary.h"
+#include "proc_info.h"
+#include "md5.h"
 #include "data_directory_header.h"
 
 #define USHORT	WINDOWS::USHORT

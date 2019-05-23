@@ -9,6 +9,7 @@ extern std::vector<dll_import_struct_t*>		dll_imports;
 extern bool										check_first_thunk;
 extern binary_t*								pe_file;
 extern std::string								unpacked_file_name;
+extern proc_info_t*								proc_info;
 /******************* Data for the unpacker *******************/
 ADDRINT											saved_addr;			// temporary variable needed for storing state between
 																	// two analysis routines
@@ -56,7 +57,8 @@ void instrument_mem_cflow(INS ins, void *v)
 		INS_InsertPredicatedCall(
 			ins,
 			IPOINT_BEFORE,              
-			(AFUNPTR)queue_memwrite,	
+			(AFUNPTR)queue_memwrite,
+			IARG_INST_PTR,
 			IARG_MEMORYWRITE_EA,        
 			IARG_END                    
 		);
@@ -70,7 +72,8 @@ void instrument_mem_cflow(INS ins, void *v)
 			INS_InsertPredicatedCall(
 				ins,
 				IPOINT_AFTER,           
-				(AFUNPTR)log_memwrite,  
+				(AFUNPTR)log_memwrite, 
+				IARG_INST_PTR,
 				IARG_MEMORYWRITE_SIZE,  
 				IARG_END                
 			);
@@ -83,6 +86,7 @@ void instrument_mem_cflow(INS ins, void *v)
 				ins,
 				IPOINT_TAKEN_BRANCH,        
 				(AFUNPTR)log_memwrite,      
+				IARG_INST_PTR,
 				IARG_MEMORYWRITE_SIZE,      
 				IARG_END                    
 			);
@@ -107,7 +111,7 @@ void instrument_mem_cflow(INS ins, void *v)
 	pushad_popad_heuristic.check_pushad_popad(ins);
 }
 
-void queue_memwrite(ADDRINT addr)
+void queue_memwrite(ADDRINT ins_addr, ADDRINT addr)
 /*
 *   Function which will save for a moment the address
 *   of the instruction which will copy memory.
@@ -115,10 +119,12 @@ void queue_memwrite(ADDRINT addr)
 *   execution is possible to record the address
 */
 {
+	if (proc_info->is_known_library_instruction(ins_addr))
+		return;
 	saved_addr = addr;
 }
 
-void log_memwrite(UINT32 size)
+void log_memwrite(ADDRINT ins_addr, UINT32 size)
 /*
 *   Function to log in shared_mem the address and the size of
 *   copied data from a copy instruction
@@ -126,6 +132,9 @@ void log_memwrite(UINT32 size)
 {
 	ADDRINT addr = saved_addr;
 	unsigned char aux;
+
+	if (proc_info->is_known_library_instruction(ins_addr))
+		return;
 
 	for (ADDRINT i = addr; i < addr + size; i++)
 	{
@@ -181,6 +190,9 @@ void check_indirect_ctransfer(ADDRINT ip, ADDRINT target, BOOL taken)
 */
 {
 	if (!taken)
+		return;
+
+	if (proc_info->is_known_library_instruction(ip))
 		return;
 
 	w_xor_x_heuristic.set_shadow_memory_as_executable(target);

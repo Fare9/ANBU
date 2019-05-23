@@ -258,6 +258,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="anti-methods\anti-methods.cpp" />
+    <ClCompile Include="md5.cpp" />
     <ClCompile Include="PE\data_directory_header.cpp" />
     <ClCompile Include="PE\dos_header.cpp" />
     <ClCompile Include="PE\builder.cpp" />
@@ -266,6 +267,7 @@
     <ClCompile Include="PE\nt_header.cpp" />
     <ClCompile Include="PE\optional_header.cpp" />
     <ClCompile Include="PE\binary.cpp" />
+    <ClCompile Include="PE\proc_info.cpp" />
     <ClCompile Include="PE\section_header.cpp" />
     <ClCompile Include="unpacker.cpp" />
     <ClCompile Include="Unpackers\generic_instrumentation.cpp" />
@@ -284,6 +286,7 @@
   <ItemGroup>
     <ClInclude Include="anti-methods\anti-methods.h" />
     <ClInclude Include="common.h" />
+    <ClInclude Include="md5.h" />
     <ClInclude Include="PE\data_directory_header.h" />
     <ClInclude Include="PE\dos_header.h" />
     <ClInclude Include="PE\builder.h" />
@@ -292,6 +295,7 @@
     <ClInclude Include="PE\nt_header.h" />
     <ClInclude Include="PE\optional_header.h" />
     <ClInclude Include="PE\binary.h" />
+    <ClInclude Include="PE\proc_info.h" />
     <ClInclude Include="PE\section_header.h" />
     <ClInclude Include="PE\structures_and_enums.h" />
     <ClInclude Include="unpacker.h" />
