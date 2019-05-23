@@ -31,6 +31,7 @@ I'm not professional on this, but I give some examples to the people who wanna t
 - FSG
 - Mpress
 - Aspack
+- pokecrypt
 - Basic RunPE
 - Test
 
@@ -53,11 +54,12 @@ And I wrote the next thing:
 
 ## Changelog
 
-### Version 0.6 (we will start for this one, why not?)
+### Version 0.7
 
-- Written the base of the unpacker.
-- Added two heuristics to unpacking model.
 - some packers unpacked and tests done for reliability and stability of the tool.
+- Adapted Lief code for PE parsing and PE reconstruction.
+- Included ProcInfo from Arancino, improved speed in instrumentation avoiding instructions from known libraries.
+- Added new support of some unpackers.
 
 ## ToDO
 
